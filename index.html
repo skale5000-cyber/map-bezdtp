@@ -20,18 +20,24 @@
         .brand-icon, .instructor-icon { background: none; border: none; }
         .icon-wrapper, .icon-container { transition: transform 0.2s; }
         .icon-wrapper:hover, .icon-container:hover { transform: scale(1.1); }
+        
+        /* Улучшаем адаптивность меню слоев */
         .leaflet-control-layers { border-radius: 12px; padding: 5px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); border: none !important; }
-        .leaflet-control-layers-list { font-family: sans-serif; font-size: 14px; }
-        .leaflet-control-layers-overlays label { margin-bottom: 4px; cursor: pointer; }
+        .leaflet-control-layers-list { font-family: sans-serif; font-size: 13px; }
+        @media (max-width: 640px) {
+            .leaflet-control-layers { margin-top: 80px !important; } /* Сдвигаем меню ниже логотипа на мобилках */
+        }
     </style>
 </head>
 <body>
 
-    <div class="absolute top-4 left-4 z-[1000] bg-white rounded-xl shadow-lg p-3 flex items-center gap-3 border-l-4 border-blue-600">
-        <div class="bg-blue-100 p-2 rounded-lg text-blue-600 font-bold text-xl">76</div>
+    <!-- Адаптивная шапка: p-2 на мобилках, p-3 на десктопе -->
+    <div class="absolute top-2 left-2 sm:top-4 sm:left-4 z-[1000] bg-white/95 backdrop-blur-sm rounded-xl shadow-lg p-2 sm:p-3 flex items-center gap-2 sm:gap-3 border-l-4 border-blue-600 max-w-[280px] sm:max-w-none">
+        <div class="bg-blue-100 p-1.5 sm:p-2 rounded-lg text-blue-600 font-bold text-lg sm:text-xl leading-none">76</div>
         <div>
-            <h1 class="font-extrabold text-gray-800 leading-tight uppercase tracking-tight">БЕЗ ДТП</h1>
-            <p class="text-[10px] text-gray-500 font-bold uppercase tracking-widest text-center">Интерактивная карта</p>
+            <h1 class="font-extrabold text-gray-800 leading-tight uppercase tracking-tight text-sm sm:text-lg">БЕЗ ДТП</h1>
+            <p class="hidden sm:block text-[10px] text-gray-500 font-bold uppercase tracking-widest">Интерактивная карта</p>
+            <p class="block sm:hidden text-[8px] text-gray-500 font-bold uppercase tracking-widest">Карта</p>
         </div>
     </div>
 
@@ -40,10 +46,8 @@
     <script>
         // =========================================================================
         // 🗄️ БАЗА ДАННЫХ (ТВОЯ РАБОЧАЯ ЗОНА) 
-        // ВНИМАНИЕ: Каждая точка должна быть внутри { } и разделяться запятой ,
         // =========================================================================
 
-        // 1. СПИСОК ТОЧЕК С ВИДЕО (videoPointsData)
         const videoPointsData = [
             {
                 lat: 57.5871, 
@@ -52,9 +56,7 @@
                 description: "Посмотри этот короткий видео-разбор, чтобы уверенно проехать перекресток и не завалить экзамен!",
                 telegramLink: "https://t.me/bez_dtp",
                 vkCode: `<iframe src="https://vkvideo.ru/video_ext.php?oid=-236190441&id=456239017&hash=8e2ed08c09146173&hd=3" width="1280" height="720" allow="autoplay; encrypted-media; fullscreen; picture-in-picture; screen-wake-lock;" frameborder="0" allowfullscreen></iframe>`
-            }, // <-- Запятая разделяет точки!
-            
-            // ТОЧКА ЕВГЕНИЯ (Я её исправил и добавил скобки)
+            },
             {
                 lat: 57.58718, 
                 lng: 39.85072,
@@ -64,28 +66,22 @@
                 authorName: "Евгений Чернышев",
                 authorPhone: "9080367929",
                 authorPrice: "1500 руб / 1.5 часа",
-                vkCode: "" // Видео вставишь потом через CMS
+                vkCode: "" 
             } 
         ];
 
-        // 2. СПИСОК МАРШРУТОВ И УЛИЦ
         const routeLinesData = [
             {
                 title: "Улица Гагарина",
                 description: "Проезд всей улицы от светофора до кольца. Обрати внимание на знаки остановки!",
                 vkCode: `<iframe src="https://vkvideo.ru/video_ext.php?oid=-236190441&id=456239017&hash=8e2ed08c09146173&hd=3" width="1280" height="720" allow="autoplay; encrypted-media; fullscreen; picture-in-picture; screen-wake-lock;" frameborder="0" allowfullscreen></iframe>`,
                 coordinates: [
-                    [57.58910, 39.84850],
-                    [57.58860, 39.84960],
-                    [57.58810, 39.85050],
-                    [57.58750, 39.85170],
-                    [57.58680, 39.85300],
-                    [57.58610, 39.85450]
+                    [57.58910, 39.84850], [57.58860, 39.84960], [57.58810, 39.85050],
+                    [57.58750, 39.85170], [57.58680, 39.85300], [57.58610, 39.85450]
                 ]
             }
         ];
 
-        // 3. БАЗА ИНСТРУКТОРОВ (Отдельные иконки 👨‍🏫)
         const instructorsData = [
             {
                 lat: 57.5855, 
@@ -102,9 +98,8 @@
             }
         ];
 
-
         // =========================================================================
-        // ⚙️ ДВИЖОК КАРТЫ (СЮДА ЛУЧШЕ НЕ ЗАГЛЯДЫВАТЬ, ЧТОБЫ НЕ ПУГАТЬСЯ)
+        // ⚙️ ДВИЖОК КАРТЫ
         // =========================================================================
         
         const streetLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '© OpenStreetMap' });
@@ -124,8 +119,8 @@
         const instructorsGroup = L.layerGroup().addTo(map);
 
         L.control.layers(
-            { "🗺️ Карта улиц": streetLayer, "🛰️ Спутник": satelliteLayer }, 
-            { "🎬 Видео-разборы": videoMarkersGroup, "🛣️ Маршруты": routeLinesGroup, "👨‍🏫 Инструкторы": instructorsGroup }, 
+            { "🗺️ Улицы": streetLayer, "🛰️ Спутник": satelliteLayer }, 
+            { "🎬 Видео": videoMarkersGroup, "🛣️ Маршруты": routeLinesGroup, "👨‍🏫 Инструкторы": instructorsGroup }, 
             { collapsed: false, position: 'topright' }
         ).addTo(map);
 
@@ -144,16 +139,15 @@
             iconSize: [40, 60], iconAnchor: [20, 30], popupAnchor: [0, -30]
         });
 
-        // ОТРИСОВКА ВИДЕО
         videoPointsData.forEach(point => {
             let authorBlock = "";
             if (point.authorName) {
                 authorBlock = `
-                    <div class="mt-3 p-3 bg-gray-50 border border-gray-100 rounded-lg">
-                        <p class="text-[10px] font-bold text-gray-400 uppercase mb-1 tracking-wider">Разбор подготовил:</p>
-                        <p class="text-sm font-bold text-gray-800">${point.authorName}</p>
-                        ${point.authorPrice ? `<p class="text-xs text-indigo-600 font-semibold mt-0.5">${point.authorPrice}</p>` : ''}
-                        ${point.authorPhone ? `<a href="tel:${point.authorPhone}" class="mt-2 block w-full bg-emerald-500 text-white text-center py-2 rounded-md text-[11px] font-bold shadow-sm hover:bg-emerald-600 transition">📞 СВЯЗАТЬСЯ С АВТОРОМ</a>` : ''}
+                    <div class="mt-3 p-3 bg-gray-50 border border-gray-100 rounded-lg text-left">
+                        <p class="text-[10px] font-bold text-gray-400 uppercase mb-1 tracking-wider text-left">Разбор подготовил:</p>
+                        <p class="text-sm font-bold text-gray-800 text-left">${point.authorName}</p>
+                        ${point.authorPrice ? `<p class="text-xs text-indigo-600 font-semibold mt-0.5 text-left">${point.authorPrice}</p>` : ''}
+                        ${point.authorPhone ? `<a href="tel:${point.authorPhone}" class="mt-2 block w-full bg-emerald-500 text-white text-center py-2 rounded-md text-[11px] font-bold shadow-sm hover:bg-emerald-600 transition uppercase">📞 Позвонить автору</a>` : ''}
                     </div>
                 `;
             }
@@ -161,16 +155,16 @@
             const popup = `
                 <div class="bg-white flex flex-col">
                     <div class="bg-gradient-to-r from-blue-700 to-blue-500 p-4 pb-4">
-                        <span class="bg-blue-900 text-blue-100 text-[9px] font-bold px-2 py-0.5 rounded uppercase tracking-widest">Секрет инструктора</span>
-                        <h3 class="font-bold text-white text-lg mt-2 leading-tight">${point.title}</h3>
+                        <span class="bg-blue-900 text-blue-100 text-[9px] font-bold px-2 py-0.5 rounded uppercase tracking-widest text-left">Секрет инструктора</span>
+                        <h3 class="font-bold text-white text-lg mt-2 leading-tight text-left">${point.title}</h3>
                     </div>
                     ${point.vkCode ? `<div class="video-container shadow-inner bg-black">${point.vkCode}</div>` : ''}
                     <div class="p-4 flex flex-col gap-2">
-                        ${point.description ? `<p class="text-sm text-gray-600 leading-relaxed font-medium">${point.description}</p>` : ''}
+                        ${point.description ? `<p class="text-sm text-gray-600 leading-relaxed font-medium text-left">${point.description}</p>` : ''}
                         ${authorBlock}
                         ${point.telegramLink ? `
-                        <a href="${point.telegramLink}" target="_blank" class="w-full flex justify-center items-center gap-2 bg-[#2AABEE] hover:bg-[#229ED9] text-white py-2.5 rounded-lg text-sm font-bold transition shadow-md mt-1">
-                            ОБСУДИТЬ В ГРУППЕ
+                        <a href="${point.telegramLink}" target="_blank" class="w-full flex justify-center items-center gap-2 bg-[#2AABEE] hover:bg-[#229ED9] text-white py-2.5 rounded-lg text-sm font-bold transition shadow-md mt-1 uppercase">
+                            Обсудить в группе
                         </a>` : ''}
                     </div>
                 </div>`;
@@ -178,48 +172,44 @@
             videoMarkersGroup.addLayer(marker);
         });
 
-        // ОТРИСОВКА МАРШРУТОВ
         routeLinesData.forEach(route => {
             const routeLine = L.polyline(route.coordinates, { color: '#10B981', weight: 8, opacity: 0.8, lineJoin: 'round' });
             const popup = `
-                <div class="bg-white flex flex-col">
+                <div class="bg-white flex flex-col text-left">
                     <div class="bg-gradient-to-r from-emerald-600 to-emerald-400 p-4 pb-4">
-                        <span class="bg-emerald-900 text-emerald-100 text-[9px] font-bold px-2 py-0.5 rounded uppercase tracking-widest">Проезд участка</span>
-                        <h3 class="font-bold text-white text-lg mt-2 leading-tight">${route.title}</h3>
+                        <span class="bg-emerald-900 text-emerald-100 text-[9px] font-bold px-2 py-0.5 rounded uppercase tracking-widest text-left">Проезд участка</span>
+                        <h3 class="font-bold text-white text-lg mt-2 leading-tight text-left">${route.title}</h3>
                     </div>
                     ${route.vkCode ? `<div class="video-container shadow-inner bg-black">${route.vkCode}</div>` : ''}
                     <div class="p-4 flex flex-col gap-3">
-                        <p class="text-sm text-gray-600 leading-relaxed font-medium">${route.description}</p>
+                        <p class="text-sm text-gray-600 leading-relaxed font-medium text-left">${route.description}</p>
                     </div>
                 </div>`;
             routeLine.bindPopup(popup);
             routeLinesGroup.addLayer(routeLine);
         });
 
-        // ОТРИСОВКА ИНСТРУКТОРОВ
         instructorsData.forEach(inst => {
             const ratingHtml = inst.rating 
                 ? `⭐⭐⭐⭐⭐ ${inst.rating} (${inst.reviewsCount} отзывов)` 
                 : '⭐⭐⭐⭐⭐ (Новый инструктор)';
 
             const popup = `
-                <div class="bg-white flex flex-col">
+                <div class="bg-white flex flex-col text-left">
                     <div class="bg-gradient-to-r from-orange-400 to-red-500 p-4 flex gap-3 items-center">
                         <img src="${inst.photoUrl}" class="w-14 h-14 rounded-full border-2 border-white shadow-sm object-cover" alt="${inst.name}">
-                        <div class="text-white">
-                            <h3 class="font-bold text-lg leading-tight">${inst.name}</h3>
-                            <p class="text-orange-100 text-xs">${inst.car}</p>
-                            <div class="text-yellow-300 text-[10px] mt-1 font-bold uppercase tracking-wider">${ratingHtml}</div>
+                        <div class="text-white text-left">
+                            <h3 class="font-bold text-lg leading-tight text-left">${inst.name}</h3>
+                            <p class="text-orange-100 text-xs text-left">${inst.car}</p>
+                            <div class="text-yellow-300 text-[10px] mt-1 font-bold uppercase tracking-wider text-left">${ratingHtml}</div>
                         </div>
                     </div>
                     <div class="p-4 flex flex-col gap-3">
-                        ${inst.description ? `<p class="text-sm text-gray-600 italic">"${inst.description}"</p>` : ''}
-                        
+                        ${inst.description ? `<p class="text-sm text-gray-600 italic text-left">"${inst.description}"</p>` : ''}
                         <div class="flex gap-2 mt-1">
                             ${inst.phone ? `<a href="tel:${inst.phone}" class="flex-1 bg-emerald-500 text-white text-center py-2.5 rounded-lg text-xs font-bold hover:bg-emerald-600 transition shadow uppercase">📞 Позвонить</a>` : ''}
-                            ${inst.telegramLink ? `<a href="${inst.telegramLink}" target="_blank" class="flex-1 bg-[#2AABEE] text-white text-center py-2.5 rounded-lg text-xs font-bold hover:bg-[#229ED9] transition shadow uppercase">💬 Написать</a>` : ''}
+                            ${inst.telegramLink ? `<a href="${inst.telegramLink}" target="_blank" class="flex-1 bg-[#2AABEE] text-white text-center py-2.5 rounded-lg text-xs font-bold hover:bg-[#229ED9] transition shadow uppercase text-center">💬 Написать</a>` : ''}
                         </div>
-                        
                         <div class="mt-2 pt-3 border-t border-gray-100 flex justify-between items-center">
                             <span class="text-[10px] text-gray-400 font-bold uppercase tracking-tight">Учились у него?</span>
                             <a href="${inst.reviewsLink || '#'}" target="_blank" class="text-[11px] font-bold text-blue-600 hover:text-blue-800 transition flex items-center gap-1 uppercase">
