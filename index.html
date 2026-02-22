@@ -5,29 +5,21 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Без ДТП 76 | Интерактивная карта</title>
     
-    <!-- Подключаем стили и скрипты карты (Leaflet) -->
     <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" crossorigin=""/>
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js" crossorigin=""></script>
-    
-    <!-- Подключаем дизайн (Tailwind CSS) -->
     <script src="https://cdn.tailwindcss.com"></script>
     
     <style>
         body { margin: 0; padding: 0; background-color: #f3f4f6; font-family: sans-serif; }
         #map { height: 100vh; width: 100vw; z-index: 1; }
         
-        /* Стили для всплывающего окна (делаем его широким для видео) */
         .leaflet-popup-content-wrapper { padding: 0; overflow: hidden; border-radius: 1rem; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04); }
         .leaflet-popup-content { margin: 0; width: 340px !important; } 
-        
-        /* Кнопка закрытия (крестик) */
         .leaflet-container a.leaflet-popup-close-button { color: white; top: 12px; right: 12px; z-index: 10; text-shadow: 0 1px 3px rgba(0,0,0,0.8); }
         
-        /* Делаем видео адаптивным (Responsive iframe) */
         .video-container { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; background-color: #000; }
         .video-container iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; }
         
-        /* Красивая иконка твоего бренда */
         .brand-icon { background: none; border: none; }
         .icon-wrapper { transition: transform 0.2s; }
         .icon-wrapper:hover { transform: scale(1.1); }
@@ -35,7 +27,6 @@
 </head>
 <body>
 
-    <!-- Шапка сайта поверх карты (UI элемент) -->
     <div class="absolute top-4 left-4 z-[1000] bg-white rounded-xl shadow-lg p-3 flex items-center gap-3 border-l-4 border-blue-600">
         <div class="bg-blue-100 p-2 rounded-lg text-blue-600 font-bold text-xl">76</div>
         <div>
@@ -44,26 +35,21 @@
         </div>
     </div>
 
-    <!-- Сама карта -->
     <div id="map"></div>
 
     <script>
-        // 1. Инициализация карты (центр на Арене 2000 в Ярославле)
         const map = L.map('map', {
             center: [57.5871, 39.8515],
             zoom: 16
         });
 
-        // ПОЛНОСТЬЮ УБИРАЕМ логотип Leaflet и любые политические флаги (Clean UI)
         map.attributionControl.setPrefix('');
 
-        // 2. Добавляем слой дорог
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             maxZoom: 19,
             attribution: '© OpenStreetMap'
         }).addTo(map);
 
-        // 3. Создаем уникальную иконку для твоих разборов
         const customIcon = L.divIcon({
             className: 'brand-icon',
             html: `
@@ -76,31 +62,29 @@
             popupAnchor: [0, -20]
         });
 
-        // 4. МЕТКА С ВСТРОЕННЫМ ВИДЕО ОТ АЛЕКСЕЯ (EMBED)
-        const iframeCode = `
+        // ==========================================
+        // ТОЧКА 1: МЕТКА С ВСТРОЕННЫМ ВИДЕО (EMBED)
+        // ==========================================
+        const iframeCode1 = `
             <iframe src="https://vkvideo.ru/video_ext.php?oid=-236190441&id=456239017&hash=8e2ed08c09146173&hd=3" width="1280" height="720" allow="autoplay; encrypted-media; fullscreen; picture-in-picture; screen-wake-lock;" frameborder="0" allowfullscreen></iframe>
         `;
 
         const markerPopupHtml = `
             <div class="bg-white flex flex-col">
-                <!-- Шапка карточки -->
                 <div class="bg-gradient-to-r from-blue-700 to-blue-500 p-4 pb-4">
                     <span class="bg-blue-900 text-blue-100 text-[10px] font-bold px-2 py-1 rounded uppercase tracking-wide">Секрет инструктора</span>
                     <h3 class="font-bold text-white text-lg mt-2 leading-tight">Разбор перекрестка у Арены</h3>
                 </div>
                 
-                <!-- БЛОК С ВИДЕО (Эмбед) -->
                 <div class="video-container shadow-inner bg-black">
-                    ${iframeCode}
+                    ${iframeCode1}
                 </div>
                 
-                <!-- Описание и действия -->
                 <div class="p-4 flex flex-col gap-3">
                     <p class="text-sm text-gray-700 leading-relaxed">
                         Посмотри этот короткий видео-разбор, чтобы уверенно проехать перекресток и не завалить экзамен!
                     </p>
                     
-                    <!-- Кнопка перехода в твой закрытый ТГ -->
                     <a href="https://t.me/bez_dtp" target="_blank" class="w-full flex justify-center items-center gap-2 bg-[#2AABEE] hover:bg-[#229ED9] text-white py-2.5 rounded-lg text-sm font-semibold transition shadow-md">
                         <svg class="w-5 h-5" fill="currentColor" viewBox="0 0 24 24"><path d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm4.64 6.8c-.15 1.58-.8 5.42-1.13 7.19-.14.75-.42 1-.68 1.03-.58.05-1.02-.38-1.58-.75-.88-.58-1.38-.94-2.23-1.5-.99-.65-.35-1.01.22-1.59.15-.15 2.71-2.48 2.76-2.69a.2.2 0 00-.05-.18c-.06-.05-.14-.03-.21-.02-.09.02-1.49.95-4.22 2.79-.4.27-.76.41-1.08.4-.36-.01-1.04-.2-1.55-.37-.63-.2-1.12-.31-1.08-.66.02-.18.27-.36.74-.55 2.92-1.27 4.86-2.11 5.83-2.51 2.78-1.16 3.35-1.36 3.73-1.36.08 0 .27.02.39.12.1.08.13.19.14.27-.01.06.01.24 0 .24z"></path></svg>
                         Обсудить в закрытой группе
@@ -111,10 +95,48 @@
 
         const marker = L.marker([57.5871, 39.8515], {icon: customIcon}).addTo(map);
         marker.bindPopup(markerPopupHtml);
+        // АВТООТКРЫТИЕ ОТКЛЮЧЕНО! Окно выскочит только если ученик сам нажмет на иконку.
 
-        // Открываем попап сразу для демонстрации
-        marker.openPopup();
+        // ==========================================
+        // ТОЧКА 2: МАРШРУТ УЛИЦЫ (Полилиния)
+        // ==========================================
+        
+        const streetCoordinates = [
+            [57.58910, 39.84850],
+            [57.58860, 39.84960],
+            [57.58810, 39.85050],
+            [57.58750, 39.85170],
+            [57.58680, 39.85300],
+            [57.58610, 39.85450]
+        ];
 
+        const routeLine = L.polyline(streetCoordinates, {
+            color: '#10B981', // Изумрудный цвет
+            weight: 8,
+            opacity: 0.8,
+            lineJoin: 'round'
+        }).addTo(map);
+
+        const iframeCode2 = `<iframe src="https://vkvideo.ru/video_ext.php?oid=-236190441&id=456239017&hash=8e2ed08c09146173&hd=3" width="1280" height="720" allow="autoplay; encrypted-media; fullscreen; picture-in-picture; screen-wake-lock;" frameborder="0" allowfullscreen></iframe>`;
+
+        const routePopupHtml = `
+            <div class="bg-white flex flex-col">
+                <div class="bg-gradient-to-r from-emerald-600 to-emerald-400 p-4 pb-4">
+                    <span class="bg-emerald-900 text-emerald-100 text-[10px] font-bold px-2 py-1 rounded uppercase tracking-wide">Проезд улицы</span>
+                    <h3 class="font-bold text-white text-lg mt-2 leading-tight">Улица Гагарина</h3>
+                </div>
+                <div class="video-container shadow-inner bg-black">${iframeCode2}</div>
+                <div class="p-4 flex flex-col gap-3">
+                    <p class="text-sm text-gray-700 leading-relaxed">Проезд всей улицы от светофора до кольца. Обрати внимание на знаки остановки!</p>
+                </div>
+            </div>
+        `;
+
+        routeLine.bindPopup(routePopupHtml);
+
+    </script>
+</body>
+</html>
     </script>
 </body>
 </html>
