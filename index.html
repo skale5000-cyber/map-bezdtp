@@ -40,12 +40,10 @@
 <body>
 
     <!-- ======================================================= -->
-    <!-- АДАПТИВНЫЙ ЛОГОТИП (Сворачивается в "76" на телефоне)   -->
+    <!-- АДАПТИВНЫЙ ЛОГОТИП (Левый верхний угол)                 -->
     <!-- ======================================================= -->
-    <div class="absolute top-3 left-3 z-[1000] bg-white/95 backdrop-blur-md rounded-2xl shadow-lg flex items-center border-l-4 border-blue-600 overflow-hidden transition-all duration-300">
-        <!-- Синий квадрат всегда виден -->
+    <div class="absolute top-3 left-3 z-[1000] bg-white/95 backdrop-blur-md rounded-2xl shadow-lg flex items-center border-l-4 border-blue-600 overflow-hidden transition-all duration-300 pointer-events-auto">
         <div class="bg-blue-100 px-3 py-2 text-blue-700 font-black text-xl leading-none italic">76</div>
-        <!-- Текст скрыт на мобилках (hidden), появляется на компьютерах (sm:flex) -->
         <div class="px-4 py-2 hidden sm:flex flex-col">
             <h1 class="font-black text-gray-900 uppercase leading-none text-lg italic">БЕЗ ДТП</h1>
             <p class="text-[9px] text-gray-500 font-bold uppercase leading-none mt-1 tracking-widest">Интерактивная карта</p>
@@ -165,21 +163,22 @@
         const streetLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 });
         const satelliteLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { maxZoom: 19 });
 
-        // Определяем, телефон ли это
-        const isMobile = window.innerWidth < 768;
-
         const map = L.map('map', { center: [57.5871, 39.8515], zoom: 16, layers: [streetLayer], zoomControl: false });
+        
+        // ВАЖНО: УБИРАЕМ ПОЛИТИКУ (Копирайт с флагом)
+        map.attributionControl.setPrefix(''); 
+        
         L.control.zoom({ position: 'bottomright' }).addTo(map);
 
         const videoMarkersGroup = L.layerGroup().addTo(map);
         const routeLinesGroup = L.layerGroup().addTo(map);
         const instructorsGroup = L.layerGroup().addTo(map);
 
-        // Умное меню слоев: свернуто всегда на телефоне, перенесено влево вниз
+        // ВАЖНО: СЛОИ ТЕПЕРЬ ВСЕГДА В ПРАВОМ ВЕРХНЕМ УГЛУ (Не конфликтуют с логотипом)
         L.control.layers(
             { "🗺️ Улицы": streetLayer, "🛰️ Спутник": satelliteLayer }, 
             { "🎬 Видео": videoMarkersGroup, "🛣️ Маршруты": routeLinesGroup, "👨‍🏫 Профи": instructorsGroup }, 
-            { collapsed: isMobile, position: isMobile ? 'bottomleft' : 'topright' }
+            { collapsed: true, position: 'topright' } 
         ).addTo(map);
 
         const customIcon = L.divIcon({
