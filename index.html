@@ -3,9 +3,9 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
-    <title>БЕЗ ДТП 76 | Платформа Инструкторов</title>
+    <title>БЕЗ ДТП 76 | Интерактивная карта</title>
     
-    <!-- 📊 ЯНДЕКС МЕТРИКА (ID: 106957722) -->
+    <!-- 📊 ЯНДЕКС МЕТРИКА -->
     <script type="text/javascript">
        (function(m,e,t,r,i,k,a){m[i]=m[i]||function(){(m[i].a=m[i].a||[]).push(arguments)};
        m[i].l=1*new Date();
@@ -20,73 +20,66 @@
     <script src="https://cdn.tailwindcss.com"></script>
     
     <style>
-        body { margin: 0; padding: 0; background-color: #f3f4f6; font-family: sans-serif; overflow: hidden; }
+        body { margin: 0; padding: 0; background-color: #f3f4f6; overflow: hidden; font-family: sans-serif; }
         #map { height: 100vh; width: 100vw; z-index: 1; }
         
-        /* --- Анимация Логотипа --- */
-        .logo-container { transition: all 0.5s cubic-bezier(0.4, 0, 0.2, 1); max-width: 50px; overflow: hidden; white-space: nowrap; }
-        .logo-container:hover, .logo-container.expanded { max-width: 300px; }
-        .logo-text { opacity: 0; transition: opacity 0.3s; transform: translateX(-10px); }
-        .expanded .logo-text, .logo-container:hover .logo-text { opacity: 1; transform: translateX(0); }
-
-        /* --- Стили Попапов --- */
-        .leaflet-popup-content-wrapper { padding: 0; overflow: hidden; border-radius: 1.25rem; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.4); }
-        .leaflet-popup-content { margin: 0 !important; width: 320px !important; } 
-        @media (max-width: 640px) { .leaflet-popup-content { width: 285px !important; } }
-        .leaflet-container a.leaflet-popup-close-button { color: white !important; top: 12px; right: 12px; z-index: 100; text-shadow: 0 1px 5px rgba(0,0,0,1); font-size: 24px !important; }
+        /* Стили всплывающих окон (Popups) */
+        .leaflet-popup-content-wrapper { padding: 0; overflow: hidden; border-radius: 1rem; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.2); }
+        .leaflet-popup-content { margin: 0 !important; width: 340px !important; } 
+        @media (max-width: 640px) {
+            .leaflet-popup-content { width: 300px !important; } /* Чуть уже для мобилок */
+        }
         
-        /* --- Видео Плеер --- */
+        .leaflet-container a.leaflet-popup-close-button { color: white !important; top: 12px !important; right: 12px !important; z-index: 100; text-shadow: 0 1px 3px rgba(0,0,0,1); font-size: 22px !important; }
+        
         .video-container { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; background-color: #000; }
         .video-container iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; }
         
-        /* --- Кастомное меню Слоев --- */
-        .leaflet-control-layers { border: none !important; border-radius: 16px !important; box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.2) !important; overflow: hidden; }
-        .leaflet-control-layers-toggle { background-size: 20px !important; width: auto !important; height: auto !important; padding: 8px 12px 8px 42px !important; display: flex; align-items: center; background-position: 10px center !important; }
+        .brand-icon, .instructor-icon { background: none; border: none; }
         
-        /* Добавляем текст "Слои" на кнопку */
-        .leaflet-control-layers-toggle::after { content: "Слои"; font-weight: bold; font-size: 14px; color: #374151; }
-        @media (max-width: 640px) {
-            .leaflet-control-layers { margin-bottom: 30px !important; margin-left: 15px !important; }
-        }
-
-        .brand-icon { background: none; border: none; }
-        .icon-wrapper { transition: transform 0.2s; filter: drop-shadow(0 4px 6px rgba(0,0,0,0.3)); }
+        /* Дизайн меню слоев Leaflet */
+        .leaflet-control-layers { border-radius: 12px !important; border: none !important; box-shadow: 0 4px 12px rgba(0,0,0,0.15) !important; }
     </style>
 </head>
 <body>
 
-    <!-- АДАПТИВНЫЙ АНИМИРОВАННЫЙ ЛОГОТИП -->
-    <div id="mainLogo" onclick="this.classList.toggle('expanded')" class="logo-container absolute top-4 left-4 z-[1000] bg-white/95 backdrop-blur-md rounded-2xl shadow-2xl flex items-center border-l-4 border-blue-600 cursor-pointer p-1">
-        <div class="bg-blue-100 min-w-[42px] h-[42px] flex items-center justify-center rounded-xl text-blue-700 font-black text-xl italic">76</div>
-        <div class="logo-text ml-3 pr-4">
-            <h1 class="font-black text-gray-900 leading-none uppercase tracking-tighter text-lg italic">БЕЗ ДТП</h1>
-            <p class="text-[9px] text-gray-500 font-bold uppercase tracking-widest mt-1">Интерактивная карта</p>
+    <!-- АДАПТИВНЫЙ ЛОГОТИП (Скрывает текст на телефоне, оставляет только 76) -->
+    <div class="absolute top-3 left-3 sm:top-4 sm:left-4 z-[1000] bg-white/95 backdrop-blur-sm rounded-xl shadow-lg p-2 sm:p-3 flex items-center gap-2 sm:gap-3 border-l-4 border-blue-600 transition-all duration-300">
+        <div class="bg-blue-100 p-1.5 sm:p-2 rounded-lg text-blue-600 font-bold text-lg sm:text-xl leading-none">76</div>
+        <!-- Класс hidden sm:block означает: скрыть на телефоне, показать на компьютере -->
+        <div class="hidden sm:block">
+            <h1 class="font-extrabold text-gray-800 leading-tight uppercase tracking-tight text-sm sm:text-lg">БЕЗ ДТП</h1>
+            <p class="text-[10px] text-gray-500 font-bold uppercase tracking-widest leading-none mt-1">Интерактивная карта</p>
         </div>
     </div>
 
     <div id="map"></div>
 
     <script>
-        // --- БАЗА ДАННЫХ ---
+        // =========================================================================
+        // 🗄️ БАЗА ДАННЫХ (ТВОЯ РАБОЧАЯ ЗОНА)
+        // ВНИМАНИЕ НА allowfullscreen в коде видео!
+        // =========================================================================
+
         const videoPointsData = [
             {
                 lat: 57.5871, 
                 lng: 39.8515,
                 title: "Разбор перекрестка у Арены",
-                description: "Посмотри видео, чтобы уверенно проехать перекресток и не завалить экзамен!",
+                description: "Посмотри короткий видео-разбор, чтобы уверенно проехать перекресток и не завалить экзамен!",
                 telegramLink: "https://t.me/bez_dtp",
-                vkCode: `<iframe src="https://vkvideo.ru/video_ext.php?oid=-236190441&id=456239017&hash=8e2ed08c09146173&hd=3" allow="autoplay; encrypted-media; fullscreen; picture-in-picture;" allowfullscreen="true"></iframe>`
+                vkCode: `<iframe src="https://vkvideo.ru/video_ext.php?oid=-236190441&id=456239017&hash=8e2ed08c09146173&hd=3" allow="autoplay; encrypted-media; fullscreen; picture-in-picture;" allowfullscreen></iframe>`
             },
             {
                 lat: 57.58718, 
                 lng: 39.85072,
-                title: "Разбор от Евгения Чернышева",
+                title: "Разбор от Евгения",
                 description: "Внимание на правый ряд! Типичная ловушка для новичков на этом участке.",
                 telegramLink: "https://t.me/evg_chernyshev",
                 authorName: "Евгений Чернышев",
                 authorPhone: "9080367929",
                 authorPrice: "1500 руб / 1.5 часа",
-                vkCode: `<iframe src="https://vkvideo.ru/video_ext.php?oid=-236190441&id=456239017&hash=8e2ed08c09146173&hd=3" allow="autoplay; encrypted-media; fullscreen; picture-in-picture;" allowfullscreen="true"></iframe>`
+                vkCode: `<iframe src="https://vkvideo.ru/video_ext.php?oid=-236190441&id=456239017&hash=8e2ed08c09146173&hd=3" allow="autoplay; encrypted-media; fullscreen; picture-in-picture;" allowfullscreen></iframe>`
             }
         ];
 
@@ -94,7 +87,7 @@
             {
                 title: "Улица Гагарина",
                 description: "Проезд всей улицы от светофора до кольца. Обрати внимание на знаки остановки!",
-                vkCode: `<iframe src="https://vkvideo.ru/video_ext.php?oid=-236190441&id=456239017&hash=8e2ed08c09146173&hd=3" allow="autoplay; encrypted-media; fullscreen; picture-in-picture;" allowfullscreen="true"></iframe>`,
+                vkCode: `<iframe src="https://vkvideo.ru/video_ext.php?oid=-236190441&id=456239017&hash=8e2ed08c09146173&hd=3" allow="autoplay; encrypted-media; fullscreen; picture-in-picture;" allowfullscreen></iframe>`,
                 coordinates: [
                     [57.58910, 39.84850], [57.58860, 39.84960], [57.58810, 39.85050],
                     [57.58750, 39.85170], [57.58680, 39.85300], [57.58610, 39.85450]
@@ -112,63 +105,139 @@
                 description: "Научу водить без стресса и паники! Разбираем сложные маршруты Ярославля.",
                 telegramLink: "https://t.me/bez_dtp",
                 photoUrl: "https://images.unsplash.com/photo-1560250097-0b93528c311a?q=80&w=100&auto=format&fit=crop",
-                rating: "5.0",
-                reviewsCount: 12,
+                rating: "4.9",
+                reviewsCount: 48,
                 reviewsLink: "https://t.me/bez_dtp"
             }
         ];
 
-        // --- ДВИЖОК КАРТЫ ---
+        // =========================================================================
+        // ⚙️ ДВИЖОК КАРТЫ
+        // =========================================================================
+        
         const streetLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 });
         const satelliteLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { maxZoom: 19 });
 
-        const isMobile = window.innerWidth < 640;
-        const map = L.map('map', { center: [57.5871, 39.8515], zoom: 16, layers: [streetLayer], zoomControl: false });
+        const map = L.map('map', { 
+            center: [57.5871, 39.8515], 
+            zoom: 16, 
+            layers: [streetLayer],
+            zoomControl: false 
+        });
+        
         map.attributionControl.setPrefix('');
         L.control.zoom({ position: 'bottomright' }).addTo(map);
 
-        const videoGroup = L.layerGroup().addTo(map);
-        const routeGroup = L.layerGroup().addTo(map);
-        const instGroup = L.layerGroup().addTo(map);
+        const videoMarkersGroup = L.layerGroup().addTo(map);
+        const routeLinesGroup = L.layerGroup().addTo(map);
+        const instructorsGroup = L.layerGroup().addTo(map);
 
+        // МЕНЮ СЛОЕВ: collapsed: true означает, что оно свернуто в иконку по умолчанию
         L.control.layers(
-            { "🗺️ Схема": streetLayer, "🛰️ Спутник": satelliteLayer }, 
-            { "🎬 Видео-разборы": videoGroup, "🛣️ Маршруты": routeGroup, "👨‍🏫 Инструкторы": instGroup }, 
-            { collapsed: true, position: isMobile ? 'bottomleft' : 'topright' }
+            { "🗺️ Карта улиц": streetLayer, "🛰️ Спутник": satelliteLayer }, 
+            { "🎬 Видео-разборы": videoMarkersGroup, "🛣️ Маршруты": routeLinesGroup, "👨‍🏫 Инструкторы": instructorsGroup }, 
+            { collapsed: true, position: 'topright' } 
         ).addTo(map);
 
-        // Раскрываем логотип через 1.5 сек после старта (wow-эффект)
-        setTimeout(() => document.getElementById('mainLogo').classList.add('expanded'), 1500);
-
-        const videoIcon = L.divIcon({
+        const customIcon = L.divIcon({
             className: 'brand-icon',
-            html: `<div class="icon-wrapper w-11 h-11 bg-blue-600 rounded-full border-4 border-white shadow-2xl flex items-center justify-center text-white text-xl">▶️</div>`,
-            iconSize: [44, 44], iconAnchor: [22, 22], popupAnchor: [0, -15]
+            html: `<div class="w-10 h-10 bg-blue-600 rounded-full border-4 border-white shadow-xl flex items-center justify-center text-white text-lg transition-transform hover:scale-110">▶️</div>`,
+            iconSize: [40, 40], iconAnchor: [20, 20], popupAnchor: [0, -15]
         });
 
-        const instIcon = L.divIcon({
+        // ИНСТРУКТОР: Текст скрывается на мобилках (hidden sm:block)
+        const instructorIcon = L.divIcon({
             className: 'instructor-icon',
-            html: `<div class="icon-container w-10 h-10 bg-orange-500 rounded-full border-2 border-white shadow-xl flex items-center justify-center text-xl">👨‍🏫</div><div class="text-[9px] font-black text-center mt-1 text-gray-900 bg-white/95 rounded px-1.5 py-0.5 shadow-md uppercase border border-gray-100">Инструктор</div>`,
+            html: `
+                <div class="w-10 h-10 bg-orange-500 rounded-full border-2 border-white shadow-lg flex items-center justify-center text-xl transition-transform hover:scale-110">👨‍🏫</div>
+                <div class="hidden sm:block text-[10px] font-bold text-center mt-1 text-gray-800 bg-white/90 rounded px-1 shadow-sm uppercase tracking-wide">Инструктор</div>
+            `,
             iconSize: [40, 60], iconAnchor: [20, 30], popupAnchor: [0, -30]
         });
 
         // Отрисовка Видео
-        videoPointsData.forEach(p => {
-            let author = p.authorName ? `<div class="mt-4 p-3 bg-gray-50 border border-gray-200 rounded-xl text-left"><p class="text-[10px] font-black text-gray-400 uppercase tracking-widest">Автор:</p><p class="text-sm font-black text-gray-800">${p.authorName}</p><p class="text-[11px] text-blue-600 font-bold mt-1">${p.authorPrice}</p><a href="tel:${p.authorPhone}" class="mt-3 block w-full bg-emerald-500 text-white text-center py-2 rounded-lg text-[10px] font-black shadow-lg uppercase tracking-tighter">📞 СВЯЗАТЬСЯ</a></div>` : "";
-            const html = `<div class="bg-white flex flex-col"><div class="bg-gradient-to-br from-blue-700 to-blue-500 p-5"><span class="bg-blue-900 text-blue-100 text-[8px] font-black px-2 py-1 rounded uppercase tracking-widest">Совет профи</span><h3 class="font-black text-white text-lg mt-2 leading-tight">${p.title}</h3></div><div class="video-container bg-black shadow-2xl">${p.vkCode}</div><div class="p-5 flex flex-col gap-3"><p class="text-sm text-gray-700 font-medium leading-snug">${p.description}</p>${author}<a href="${p.telegramLink}" target="_blank" class="w-full bg-[#2AABEE] text-white py-3 rounded-xl text-xs font-black shadow-lg text-center uppercase transition">ОБСУДИТЬ В ГРУППЕ</a></div></div>`;
-            L.marker([p.lat, p.lng], {icon: videoIcon}).bindPopup(html).addTo(videoGroup);
+        videoPointsData.forEach(point => {
+            let authorBlock = "";
+            if (point.authorName) {
+                authorBlock = `
+                    <div class="mt-3 p-3 bg-gray-50 border border-gray-100 rounded-lg">
+                        <p class="text-[10px] font-bold text-gray-400 uppercase mb-1 tracking-wider">Разбор подготовил:</p>
+                        <p class="text-sm font-bold text-gray-800">${point.authorName}</p>
+                        ${point.authorPrice ? `<p class="text-[11px] text-indigo-600 font-bold mt-0.5">${point.authorPrice}</p>` : ''}
+                        ${point.authorPhone ? `<a href="tel:${point.authorPhone}" class="mt-2 block w-full bg-emerald-500 text-white text-center py-2 rounded-md text-[11px] font-bold shadow hover:bg-emerald-600 transition uppercase">📞 Позвонить автору</a>` : ''}
+                    </div>
+                `;
+            }
+
+            const popup = `
+                <div class="bg-white flex flex-col">
+                    <div class="bg-gradient-to-r from-blue-700 to-blue-500 p-4">
+                        <span class="bg-blue-900 text-blue-100 text-[9px] font-bold px-2 py-0.5 rounded uppercase tracking-widest">Секрет инструктора</span>
+                        <h3 class="font-bold text-white text-lg mt-1.5 leading-tight">${point.title}</h3>
+                    </div>
+                    ${point.vkCode ? `<div class="video-container shadow-inner bg-black">${point.vkCode}</div>` : ''}
+                    <div class="p-4 flex flex-col gap-2">
+                        ${point.description ? `<p class="text-sm text-gray-600 leading-snug font-medium">${point.description}</p>` : ''}
+                        ${authorBlock}
+                        ${point.telegramLink ? `
+                        <a href="${point.telegramLink}" target="_blank" class="w-full flex justify-center items-center gap-2 bg-[#2AABEE] hover:bg-[#229ED9] text-white py-2.5 rounded-lg text-sm font-bold transition shadow-md mt-1 uppercase">
+                            Обсудить в группе
+                        </a>` : ''}
+                    </div>
+                </div>`;
+            L.marker([point.lat, point.lng], {icon: customIcon}).bindPopup(popup).addTo(videoMarkersGroup);
         });
 
         // Отрисовка Маршрутов
-        routeLinesData.forEach(r => {
-            const line = L.polyline(r.coordinates, { color: '#10B981', weight: 8, opacity: 0.8, lineJoin: 'round' }).addTo(routeGroup);
-            line.bindPopup(`<div class="bg-white flex flex-col"><div class="bg-gradient-to-br from-emerald-600 to-emerald-400 p-5"><span class="bg-emerald-900 text-emerald-100 text-[8px] font-black px-2 py-1 rounded uppercase tracking-widest">Проезд участка</span><h3 class="font-black text-white text-lg mt-2 leading-tight">${r.title}</h3></div><div class="video-container bg-black">${r.vkCode}</div><div class="p-5"><p class="text-sm text-gray-700 font-medium">${r.description}</p></div></div>`);
+        routeLinesData.forEach(route => {
+            const line = L.polyline(route.coordinates, { color: '#10B981', weight: 8, opacity: 0.8, lineJoin: 'round' }).addTo(routeLinesGroup);
+            const popup = `
+                <div class="bg-white flex flex-col">
+                    <div class="bg-gradient-to-r from-emerald-600 to-emerald-400 p-4">
+                        <span class="bg-emerald-900 text-emerald-100 text-[9px] font-bold px-2 py-0.5 rounded uppercase tracking-widest">Проезд участка</span>
+                        <h3 class="font-bold text-white text-lg mt-1.5 leading-tight">${route.title}</h3>
+                    </div>
+                    ${route.vkCode ? `<div class="video-container shadow-inner bg-black">${route.vkCode}</div>` : ''}
+                    <div class="p-4 flex flex-col gap-3">
+                        <p class="text-sm text-gray-600 leading-snug font-medium">${route.description}</p>
+                    </div>
+                </div>`;
+            line.bindPopup(popup);
         });
 
         // Отрисовка Инструкторов
-        instructorsData.forEach(i => {
-            const html = `<div class="bg-white flex flex-col"><div class="bg-gradient-to-br from-orange-400 to-red-600 p-5 flex gap-4 items-center"><img src="${i.photoUrl}" class="w-14 h-14 rounded-full border-2 border-white shadow-xl object-cover"><div class="text-white text-left"><h3 class="font-black text-lg leading-tight">${i.name}</h3><p class="text-white bg-white/20 px-1.5 rounded inline-block text-[10px] leading-tight mt-1">${i.car}</p><div class="text-yellow-300 text-[10px] mt-2 font-black tracking-wider">⭐⭐⭐⭐⭐ ${i.rating}</div></div></div><div class="p-5 flex flex-col gap-4 text-left"><p class="text-sm text-gray-700 italic">"${i.description}"</p><div class="flex gap-2"><a href="tel:${i.phone}" class="flex-1 bg-emerald-500 text-white text-center py-3 rounded-xl text-xs font-black uppercase shadow-lg">📞 Звонок</a><a href="${i.telegramLink}" target="_blank" class="flex-1 bg-[#2AABEE] text-white text-center py-3 rounded-xl text-xs font-black uppercase shadow-lg">💬 Написать</a></div><div class="pt-3 border-t border-gray-100 flex justify-between items-center"><span class="text-[10px] text-gray-400 font-black uppercase">Отзывы (${i.reviewsCount})</span><a href="${i.reviewsLink}" target="_blank" class="text-[11px] font-black text-blue-600 uppercase">Смотреть</a></div></div></div>`;
-            L.marker([i.lat, i.lng], {icon: instIcon}).bindPopup(html).addTo(instGroup);
+        instructorsData.forEach(inst => {
+            const ratingHtml = inst.rating 
+                ? `⭐⭐⭐⭐⭐ ${inst.rating} (${inst.reviewsCount} отзывов)` 
+                : '⭐⭐⭐⭐⭐ (Новый инструктор)';
+
+            const popup = `
+                <div class="bg-white flex flex-col">
+                    <div class="bg-gradient-to-r from-orange-400 to-red-500 p-4 flex gap-3 items-center">
+                        <img src="${inst.photoUrl}" class="w-14 h-14 rounded-full border-2 border-white shadow-sm object-cover" alt="${inst.name}">
+                        <div class="text-white">
+                            <h3 class="font-bold text-lg leading-tight">${inst.name}</h3>
+                            <p class="text-orange-100 text-xs">${inst.car}</p>
+                            <div class="text-yellow-300 text-[10px] mt-1 font-bold uppercase tracking-wider">${ratingHtml}</div>
+                        </div>
+                    </div>
+                    <div class="p-4 flex flex-col gap-3">
+                        ${inst.description ? `<p class="text-sm text-gray-600 italic">"${inst.description}"</p>` : ''}
+                        
+                        <div class="flex gap-2 mt-1">
+                            ${inst.phone ? `<a href="tel:${inst.phone}" class="flex-1 bg-emerald-500 text-white text-center py-2.5 rounded-lg text-xs font-bold hover:bg-emerald-600 transition shadow uppercase">📞 Позвонить</a>` : ''}
+                            ${inst.telegramLink ? `<a href="${inst.telegramLink}" target="_blank" class="flex-1 bg-[#2AABEE] text-white text-center py-2.5 rounded-lg text-xs font-bold hover:bg-[#229ED9] transition shadow uppercase">💬 Написать</a>` : ''}
+                        </div>
+                        
+                        <div class="mt-2 pt-3 border-t border-gray-100 flex justify-between items-center">
+                            <span class="text-[10px] text-gray-400 font-bold uppercase tracking-tight">Учились у него?</span>
+                            <a href="${inst.reviewsLink || '#'}" target="_blank" class="text-[11px] font-bold text-blue-600 hover:text-blue-800 transition flex items-center gap-1 uppercase">
+                                📝 Отзывы
+                            </a>
+                        </div>
+                    </div>
+                </div>`;
+            L.marker([inst.lat, inst.lng], {icon: instructorIcon}).bindPopup(popup).addTo(instructorsGroup);
         });
 
     </script>
