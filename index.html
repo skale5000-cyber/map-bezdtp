@@ -23,6 +23,11 @@
         .brand-icon { background: none; border: none; }
         .icon-wrapper { transition: transform 0.2s; }
         .icon-wrapper:hover { transform: scale(1.1); }
+        
+        /* Улучшаем внешний вид меню слоев (UI Controls) */
+        .leaflet-control-layers { border-radius: 12px; padding: 5px; box-shadow: 0 4px 6px -1px rgba(0, 0, 0, 0.1); border: none !important; }
+        .leaflet-control-layers-list { font-family: sans-serif; font-size: 14px; }
+        .leaflet-control-layers-overlays label { margin-bottom: 4px; cursor: pointer; }
     </style>
 </head>
 <body>
@@ -38,17 +43,21 @@
     <div id="map"></div>
 
     <script>
+        // 1. БАЗОВЫЕ СЛОИ (Спутник и Схема)
+        const streetLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19, attribution: '© OpenStreetMap' });
+        const satelliteLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { maxZoom: 19, attribution: 'Tiles &copy; Esri' });
+
         const map = L.map('map', {
             center: [57.5871, 39.8515],
-            zoom: 16
+            zoom: 16,
+            layers: [streetLayer] // По умолчанию включаем схему улиц
         });
 
         map.attributionControl.setPrefix('');
 
-        L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            maxZoom: 19,
-            attribution: '© OpenStreetMap'
-        }).addTo(map);
+        // 2. ГРУППЫ СЛОЕВ ДЛЯ ГАЛОЧЕК
+        const videoMarkersGroup = L.layerGroup().addTo(map);
+        const routeLinesGroup = L.layerGroup().addTo(map);
 
         const customIcon = L.divIcon({
             className: 'brand-icon',
@@ -63,7 +72,7 @@
         });
 
         // ==========================================
-        // ТОЧКА 1: МЕТКА С ВСТРОЕННЫМ ВИДЕО (EMBED)
+        // ТОЧКА 1: МЕТКА С ВСТРОЕННЫМ ВИДЕО
         // ==========================================
         const iframeCode1 = `
             <iframe src="https://vkvideo.ru/video_ext.php?oid=-236190441&id=456239017&hash=8e2ed08c09146173&hd=3" width="1280" height="720" allow="autoplay; encrypted-media; fullscreen; picture-in-picture; screen-wake-lock;" frameborder="0" allowfullscreen></iframe>
@@ -93,14 +102,12 @@
             </div>
         `;
 
-        const marker = L.marker([57.5871, 39.8515], {icon: customIcon}).addTo(map);
-        marker.bindPopup(markerPopupHtml);
-        // АВТООТКРЫТИЕ ОТКЛЮЧЕНО! Окно выскочит только если ученик сам нажмет на иконку.
+        const marker = L.marker([57.5871, 39.8515], {icon: customIcon}).bindPopup(markerPopupHtml);
+        videoMarkersGroup.addLayer(marker); // Кладем метку в группу видео!
 
         // ==========================================
         // ТОЧКА 2: МАРШРУТ УЛИЦЫ (Полилиния)
         // ==========================================
-        
         const streetCoordinates = [
             [57.58910, 39.84850],
             [57.58860, 39.84960],
@@ -115,7 +122,7 @@
             weight: 8,
             opacity: 0.8,
             lineJoin: 'round'
-        }).addTo(map);
+        });
 
         const iframeCode2 = `<iframe src="https://vkvideo.ru/video_ext.php?oid=-236190441&id=456239017&hash=8e2ed08c09146173&hd=3" width="1280" height="720" allow="autoplay; encrypted-media; fullscreen; picture-in-picture; screen-wake-lock;" frameborder="0" allowfullscreen></iframe>`;
 
@@ -133,10 +140,23 @@
         `;
 
         routeLine.bindPopup(routePopupHtml);
+        routeLinesGroup.addLayer(routeLine); // Кладем маршрут в группу маршрутов!
 
-    </script>
-</body>
-</html>
+        // ==========================================
+        // 3. МЕНЮ УПРАВЛЕНИЯ (ГАЛОЧКИ)
+        // ==========================================
+        const baseMaps = {
+            "🗺️ Карта улиц": streetLayer,
+            "🛰️ Спутник": satelliteLayer
+        };
+
+        const overlayMaps = {
+            "🎬 Видео-разборы": videoMarkersGroup,
+            "🛣️ Маршруты": routeLinesGroup
+        };
+
+        L.control.layers(baseMaps, overlayMaps, { collapsed: false, position: 'topright' }).addTo(map);
+
     </script>
 </body>
 </html>
