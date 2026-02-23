@@ -32,9 +32,13 @@
         /* Скрываем стандартные Leaflet Popups */
         .leaflet-popup { display: none !important; }
 
-        /* Кастомный скроллбар для панели */
-        #sheetContent::-webkit-scrollbar { width: 4px; }
-        #sheetContent::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
+        /* Тултипы (всплывающие названия над иконками) */
+        .custom-tooltip { background-color: rgba(255, 255, 255, 0.95); border: none; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); font-weight: bold; color: #1f2937; font-size: 11px; padding: 4px 8px; }
+        .leaflet-tooltip-top:before { border-top-color: rgba(255, 255, 255, 0.95); }
+
+        /* Кастомный скроллбар */
+        ::-webkit-scrollbar { width: 4px; }
+        ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
     </style>
 </head>
 <body>
@@ -47,6 +51,24 @@
         <div class="px-4 py-2 hidden sm:flex flex-col">
             <h1 class="font-black text-gray-900 uppercase leading-none text-lg italic">БЕЗ ДТП</h1>
             <p class="text-[9px] text-gray-500 font-bold uppercase leading-none mt-1 tracking-widest">Интерактивная карта</p>
+        </div>
+    </div>
+
+    <!-- КНОПКА ОТКРЫТИЯ СПИСКА (НАВИГАТОРА) -->
+    <div class="absolute top-[80px] left-3 z-[1000] pointer-events-auto">
+        <button onclick="openMenu()" class="bg-white/95 backdrop-blur-md text-gray-800 px-4 py-2 rounded-xl shadow-[0_4px_10px_rgba(0,0,0,0.15)] font-bold text-xs uppercase tracking-wider flex items-center gap-2 border border-gray-100 hover:bg-gray-50 transition">
+            📋 Список
+        </button>
+    </div>
+
+    <!-- МЕНЮ НАВИГАЦИИ (List View) -->
+    <div id="navMenu" class="fixed inset-y-0 right-0 z-[4000] w-full sm:w-80 bg-white shadow-2xl transform translate-x-full transition-transform duration-300 ease-in-out flex flex-col">
+        <div class="bg-blue-600 p-4 flex justify-between items-center shrink-0">
+            <h2 class="text-white font-black text-sm uppercase tracking-widest">📍 Доступные разборы</h2>
+            <button onclick="closeMenu()" class="text-white hover:text-gray-200 text-3xl leading-none focus:outline-none">&times;</button>
+        </div>
+        <div class="overflow-y-auto p-4 flex-grow bg-gray-50" id="menuContent">
+            <!-- Сюда вставится меню -->
         </div>
     </div>
 
@@ -79,6 +101,8 @@
 
     <script>
         // --- 🗄️ БАЗА ДАННЫХ ---
+        
+        // 1. ВИДЕО: Перекрестки и сложные участки
         const videoPointsData = [
             {
                 lat: 57.5871, lng: 39.8515,
@@ -96,132 +120,74 @@
                 authorPhone: "9080367929",
                 authorPrice: "1500 руб / 1.5 часа",
                 vkCode: `<iframe src="https://vkvideo.ru/video_ext.php?oid=-236190441&id=456239017&hash=8e2ed08c09146173&hd=3" allow="autoplay; encrypted-media; fullscreen; picture-in-picture;" allowfullscreen></iframe>`
-            },
-            // ТВОЯ НОВАЯ ТОЧКА УЖЕ ЗДЕСЬ!
-            {
-                lat: 57.59012, 
-                lng: 39.85937,
-                title: "улица Гагарина",
-                description: "ул. Гагарина от Московского проспекта до ул. Нефтяников",
-                telegramLink: "",
-                authorName: "",
-                authorPhone: "",
-                authorPrice: "0",
-                vkCode: `<iframe src="https://vkvideo.ru/video_ext.php?oid=-236190441&id=456239018&hash=0783681156dd1f26&hd=3" allow="autoplay; encrypted-media; fullscreen; picture-in-picture;" allowfullscreen></iframe>`
-            },{
-    lat: 57.58481, 
-    lng: 39.83561,
-    title: "улица Менделеева",
-    description: "от ул. Титова до ул. Курчатова",
-    telegramLink: "",
-    authorName: "",
-    authorPhone: "",
-    authorPrice: "0",
-    vkCode: `<iframe src="https://vkvideo.ru/video_ext.php?oid=-236190441&id=456239021&hash=2c0ea19bd41c438f&hd=3" width="1280" height="720" allow="autoplay; encrypted-media; fullscreen; picture-in-picture; screen-wake-lock;" frameborder="0" allowfullscreen></iframe>`
-},
-            {
-    lat: 57.58150, 
-    lng: 39.85189,
-    title: "улица Павлова",
-    description: "ул. Павлова от Московского проспекта и обратно",
-    telegramLink: "",
-    authorName: "",
-    authorPhone: "",
-    authorPrice: "0",
-    vkCode: `<iframe src="https://vkvideo.ru/video_ext.php?oid=-236190441&id=456239020&hash=139d4be0f98d6870&hd=3" width="1280" height="720" allow="autoplay; encrypted-media; fullscreen; picture-in-picture; screen-wake-lock;" frameborder="0" allowfullscreen></iframe>`
-},{
-    lat: 57.58063, 
-    lng: 39.83475,
-    title: "улица Гагарина",
-    description: "ул. Гагарина от ул. Нефтяников",
-    telegramLink: "",
-    authorName: "",
-    authorPhone: "",
-    authorPrice: "0",
-    vkCode: `<iframe src="https://vkvideo.ru/video_ext.php?oid=-236190441&id=456239019&hash=577b062e3ec1bd18&hd=3" width="1280" height="720" allow="autoplay; encrypted-media; fullscreen; picture-in-picture; screen-wake-lock;" frameborder="0" allowfullscreen></iframe>`
-},{
-    lat: 57.58062, 
-    lng: 39.83484,
-    title: "улица Нефтяников",
-    description: "от ул. Гагарина до Московского проспекта",
-    telegramLink: "",
-    authorName: "",
-    authorPhone: "",
-    authorPrice: "0",
-    vkCode: `<iframe src="https://vkvideo.ru/video_ext.php?oid=-236190441&id=456239029&hash=fc76b1ebf8a304e1&hd=3" width="1280" height="720" allow="autoplay; encrypted-media; fullscreen; picture-in-picture; screen-wake-lock;" frameborder="0" allowfullscreen></iframe>`
-},{
-    lat: 57.57651, 
-    lng: 39.84514,
-    title: "улица Нефтяников",
-    description: "от Московского проспекта до ул. Гагарина",
-    telegramLink: "",
-    authorName: "",
-    authorPhone: "",
-    authorPrice: "0",
-    vkCode: `<iframe src="https://vkvideo.ru/video_ext.php?oid=-236190441&id=456239028&hash=0c72141f6e801cb6&hd=3" width="1280" height="720" allow="autoplay; encrypted-media; fullscreen; picture-in-picture; screen-wake-lock;" frameborder="0" allowfullscreen></iframe>`
-},{
-    lat: 57.58683, 
-    lng: 39.83844,
-    title: "улица Титова",
-    description: "от ул. Павлова до ул. Рыкачева",
-    telegramLink: "",
-    authorName: "",
-    authorPhone: "",
-    authorPrice: "0",
-    vkCode: `<iframe src="https://vkvideo.ru/video_ext.php?oid=-236190441&id=456239027&hash=edd7df047f99efc3&hd=3" width="1280" height="720" allow="autoplay; encrypted-media; fullscreen; picture-in-picture; screen-wake-lock;" frameborder="0" allowfullscreen></iframe>`
-},{
-    lat: 57.58162, 
-    lng: 39.83596,
-    title: "улица Рыкачева, Титова",
-    description: "от ул. Гагарина до  ул. Павлова ",
-    telegramLink: "",
-    authorName: "",
-    authorPhone: "",
-    authorPrice: "0",
-    vkCode: `<iframe src="https://vkvideo.ru/video_ext.php?oid=-236190441&id=456239026&hash=f5fdfc80ffffe7e9&hd=3" width="1280" height="720" allow="autoplay; encrypted-media; fullscreen; picture-in-picture; screen-wake-lock;" frameborder="0" allowfullscreen></iframe>`
-},{
-    lat: 57.58268, 
-    lng: 39.83298,
-    title: "улица Рыкачева",
-    description: "от ул. Титова до  ул. Курчатова",
-    telegramLink: "",
-    authorName: "",
-    authorPhone: "",
-    authorPrice: "0",
-    vkCode: `<iframe src="https://vkvideo.ru/video_ext.php?oid=-236190441&id=456239022&hash=bfcc6e06b9732cc5&hd=3" width="1280" height="720" allow="autoplay; encrypted-media; fullscreen; picture-in-picture; screen-wake-lock;" frameborder="0" allowfullscreen></iframe>`
-},{
-    lat: 57.58263, 
-    lng: 39.84903,
-    title: "улица Курчатова",
-    description: "от ул. Павлова до  ул. Рыкачева",
-    telegramLink: "",
-    authorName: "",
-    authorPhone: "",
-    authorPrice: "0",
-    vkCode: `<iframe src="https://vkvideo.ru/video_ext.php?oid=-236190441&id=456239024&hash=1ddb1e564ad42f2d&hd=3" width="1280" height="720" allow="autoplay; encrypted-media; fullscreen; picture-in-picture; screen-wake-lock;" frameborder="0" allowfullscreen></iframe>`
-},{
-    lat: 57.57861, 
-    lng: 39.84353,
-    title: "улица Рыкачева, Майорова",
-    description: "от ул. Курчатова до  ул. Менделеева",
-    telegramLink: "",
-    authorName: "",
-    authorPhone: "",
-    authorPrice: "0",
-    vkCode: `<iframe src="https://vkvideo.ru/video_ext.php?oid=-236190441&id=456239023&hash=26ae89e6ca1fdb7f&hd=3" width="1280" height="720" allow="autoplay; encrypted-media; fullscreen; picture-in-picture; screen-wake-lock;" frameborder="0" allowfullscreen></iframe>`
-},{
-    lat: 57.57862, 
-    lng: 39.84344,
-    title: "улица Курчатова",
-    description: "от ул. Рыкачева до  ул. Павлова",
-    telegramLink: "",
-    authorName: "",
-    authorPhone: "",
-    authorPrice: "0",
-    vkCode: `<iframe src="https://vkvideo.ru/video_ext.php?oid=-236190441&id=456239025&hash=a8e5a6380f9b53f1&hd=3" width="1280" height="720" allow="autoplay; encrypted-media; fullscreen; picture-in-picture; screen-wake-lock;" frameborder="0" allowfullscreen></iframe>`
-},
+            }
         ];
 
+        // 2. УЛИЦЫ: Все твои новые точки выделены в отдельную группу!
+        const streetPointsData = [
+            {
+                lat: 57.59012, lng: 39.85937, title: "улица Гагарина", description: "ул. Гагарина от Московского проспекта до ул. Нефтяников", telegramLink: "", authorName: "", authorPhone: "", authorPrice: "0",
+                vkCode: `<iframe src="https://vkvideo.ru/video_ext.php?oid=-236190441&id=456239018&hash=0783681156dd1f26&hd=3" allow="autoplay; encrypted-media; fullscreen; picture-in-picture;" allowfullscreen></iframe>`
+            },
+            {
+                lat: 57.58481, lng: 39.83561, title: "улица Менделеева", description: "от ул. Титова до ул. Курчатова", telegramLink: "", authorName: "", authorPhone: "", authorPrice: "0",
+                vkCode: `<iframe src="https://vkvideo.ru/video_ext.php?oid=-236190441&id=456239021&hash=2c0ea19bd41c438f&hd=3" width="1280" height="720" allow="autoplay; encrypted-media; fullscreen; picture-in-picture; screen-wake-lock;" frameborder="0" allowfullscreen></iframe>`
+            },
+            {
+                lat: 57.58150, lng: 39.85189, title: "улица Павлова", description: "ул. Павлова от Московского проспекта и обратно", telegramLink: "", authorName: "", authorPhone: "", authorPrice: "0",
+                vkCode: `<iframe src="https://vkvideo.ru/video_ext.php?oid=-236190441&id=456239020&hash=139d4be0f98d6870&hd=3" width="1280" height="720" allow="autoplay; encrypted-media; fullscreen; picture-in-picture; screen-wake-lock;" frameborder="0" allowfullscreen></iframe>`
+            },
+            {
+                lat: 57.58063, lng: 39.83475, title: "улица Гагарина", description: "ул. Гагарина от ул. Нефтяников", telegramLink: "", authorName: "", authorPhone: "", authorPrice: "0",
+                vkCode: `<iframe src="https://vkvideo.ru/video_ext.php?oid=-236190441&id=456239019&hash=577b062e3ec1bd18&hd=3" width="1280" height="720" allow="autoplay; encrypted-media; fullscreen; picture-in-picture; screen-wake-lock;" frameborder="0" allowfullscreen></iframe>`
+            },
+            {
+                lat: 57.58062, lng: 39.83484, title: "улица Нефтяников", description: "от ул. Гагарина до Московского проспекта", telegramLink: "", authorName: "", authorPhone: "", authorPrice: "0",
+                vkCode: `<iframe src="https://vkvideo.ru/video_ext.php?oid=-236190441&id=456239029&hash=fc76b1ebf8a304e1&hd=3" width="1280" height="720" allow="autoplay; encrypted-media; fullscreen; picture-in-picture; screen-wake-lock;" frameborder="0" allowfullscreen></iframe>`
+            },
+            {
+                lat: 57.57651, lng: 39.84514, title: "улица Нефтяников", description: "от Московского проспекта до ул. Гагарина", telegramLink: "", authorName: "", authorPhone: "", authorPrice: "0",
+                vkCode: `<iframe src="https://vkvideo.ru/video_ext.php?oid=-236190441&id=456239028&hash=0c72141f6e801cb6&hd=3" width="1280" height="720" allow="autoplay; encrypted-media; fullscreen; picture-in-picture; screen-wake-lock;" frameborder="0" allowfullscreen></iframe>`
+            },
+            {
+                lat: 57.58683, lng: 39.83844, title: "улица Титова", description: "от ул. Павлова до ул. Рыкачева", telegramLink: "", authorName: "", authorPhone: "", authorPrice: "0",
+                vkCode: `<iframe src="https://vkvideo.ru/video_ext.php?oid=-236190441&id=456239027&hash=edd7df047f99efc3&hd=3" width="1280" height="720" allow="autoplay; encrypted-media; fullscreen; picture-in-picture; screen-wake-lock;" frameborder="0" allowfullscreen></iframe>`
+            },
+            {
+                lat: 57.58162, lng: 39.83596, title: "улица Рыкачева, Титова", description: "от ул. Гагарина до  ул. Павлова ", telegramLink: "", authorName: "", authorPhone: "", authorPrice: "0",
+                vkCode: `<iframe src="https://vkvideo.ru/video_ext.php?oid=-236190441&id=456239026&hash=f5fdfc80ffffe7e9&hd=3" width="1280" height="720" allow="autoplay; encrypted-media; fullscreen; picture-in-picture; screen-wake-lock;" frameborder="0" allowfullscreen></iframe>`
+            },
+            {
+                lat: 57.58268, lng: 39.83298, title: "улица Рыкачева", description: "от ул. Титова до  ул. Курчатова", telegramLink: "", authorName: "", authorPhone: "", authorPrice: "0",
+                vkCode: `<iframe src="https://vkvideo.ru/video_ext.php?oid=-236190441&id=456239022&hash=bfcc6e06b9732cc5&hd=3" width="1280" height="720" allow="autoplay; encrypted-media; fullscreen; picture-in-picture; screen-wake-lock;" frameborder="0" allowfullscreen></iframe>`
+            },
+            {
+                lat: 57.58263, lng: 39.84903, title: "улица Курчатова", description: "от ул. Павлова до  ул. Рыкачева", telegramLink: "", authorName: "", authorPhone: "", authorPrice: "0",
+                vkCode: `<iframe src="https://vkvideo.ru/video_ext.php?oid=-236190441&id=456239024&hash=1ddb1e564ad42f2d&hd=3" width="1280" height="720" allow="autoplay; encrypted-media; fullscreen; picture-in-picture; screen-wake-lock;" frameborder="0" allowfullscreen></iframe>`
+            },
+            {
+                lat: 57.57861, lng: 39.84353, title: "улица Рыкачева, Майорова", description: "от ул. Курчатова до  ул. Менделеева", telegramLink: "", authorName: "", authorPhone: "", authorPrice: "0",
+                vkCode: `<iframe src="https://vkvideo.ru/video_ext.php?oid=-236190441&id=456239023&hash=26ae89e6ca1fdb7f&hd=3" width="1280" height="720" allow="autoplay; encrypted-media; fullscreen; picture-in-picture; screen-wake-lock;" frameborder="0" allowfullscreen></iframe>`
+            },
+            {
+                lat: 57.57862, lng: 39.84344, title: "улица Курчатова", description: "от ул. Рыкачева до  ул. Павлова", telegramLink: "", authorName: "", authorPhone: "", authorPrice: "0",
+                vkCode: `<iframe src="https://vkvideo.ru/video_ext.php?oid=-236190441&id=456239025&hash=a8e5a6380f9b53f1&hd=3" width="1280" height="720" allow="autoplay; encrypted-media; fullscreen; picture-in-picture; screen-wake-lock;" frameborder="0" allowfullscreen></iframe>`
+            }
+        ];
+
+        // 3. ИНФОРМАЦИЯ (Новый слой: экзамены, документы, справки)
+        const infoPointsData = [
+            {
+                lat: 57.5880, lng: 39.8520, // Пример точки у Арены (можешь потом удалить)
+                title: "Документы для экзамена",
+                description: "Для допуска к экзамену в ГИБДД при себе необходимо иметь паспорт и квитанцию об оплате госпошлины.",
+                imageUrl: "", // Сюда вставляется ссылка на фото (jpg/png), если нужно
+                fileUrl: "",  // Сюда вставляется ссылка на PDF документ
+                phone: "+7 (4852) 11-22-33" // Если указать, появится зеленая кнопка "Позвонить"
+            }
+        ];
+
+        // 4. МАРШРУТЫ
         const routeLinesData = [
             {
                 title: "Улица Гагарина",
@@ -231,6 +197,7 @@
             },
         ];
 
+        // 4. ИНСТРУКТОРЫ
         const instructorsData = [
             {
                 lat: 57.5855, lng: 39.8500,
@@ -244,10 +211,14 @@
             }
         ];
 
+        // --- ГЛОБАЛЬНЫЙ КЭШ (Best Practice для безопасного открытия окон из меню) ---
+        const sheetCache = {};
+
         // --- ЛОГИКА ИНТЕРФЕЙСА ---
         function openSheet(htmlContent) {
             document.getElementById('sheetContent').innerHTML = htmlContent;
             document.getElementById('bottomSheet').classList.remove('translate-y-full');
+            closeMenu(); // Закрываем меню при открытии карточки
         }
 
         function closeSheet() {
@@ -255,9 +226,19 @@
             setTimeout(() => { document.getElementById('sheetContent').innerHTML = ''; }, 300);
         }
 
+        function openMenu() { document.getElementById('navMenu').classList.remove('translate-x-full'); }
+        function closeMenu() { document.getElementById('navMenu').classList.add('translate-x-full'); }
+
+        window.flyToPoint = function(lat, lng, cacheId) {
+            closeMenu();
+            map.flyTo([lat, lng], 17, { animate: true, duration: 1.5 });
+            setTimeout(() => { openSheet(sheetCache[cacheId]); }, 1500);
+        };
+
         function openFullscreen(index, arrayName) {
             let code = '';
             if (arrayName === 'videoPoints') code = videoPointsData[index].vkCode;
+            if (arrayName === 'streetPoints') code = streetPointsData[index].vkCode;
             if (arrayName === 'routeLines') code = routeLinesData[index].vkCode;
             
             const container = document.getElementById('modalVideoContent');
@@ -266,8 +247,10 @@
             const iframe = container.querySelector('iframe');
             if (iframe) {
                 iframe.style.position = 'absolute';
-                iframe.style.top = '0'; iframe.style.left = '0';
-                iframe.style.width = '100%'; iframe.style.height = '100%';
+                iframe.style.top = '0';
+                iframe.style.left = '0';
+                iframe.style.width = '100%';
+                iframe.style.height = '100%';
             }
             
             document.getElementById('bottomSheet').classList.add('translate-y-full');
@@ -288,78 +271,171 @@
 
         const map = L.map('map', { center: [57.5871, 39.8515], zoom: 16, layers: [streetLayer], zoomControl: false });
         
-        // ВАЖНО: УБИРАЕМ ПОЛИТИКУ (Копирайт с флагом)
         map.attributionControl.setPrefix(''); 
         
         L.control.zoom({ position: 'bottomright' }).addTo(map);
 
         const videoMarkersGroup = L.layerGroup().addTo(map);
+        const streetPointsGroup = L.layerGroup().addTo(map); // Группа для улиц
+        const infoPointsGroup = L.layerGroup().addTo(map);   // Группа для Информации
         const routeLinesGroup = L.layerGroup().addTo(map);
         const instructorsGroup = L.layerGroup().addTo(map);
 
-        // ВАЖНО: СЛОИ ТЕПЕРЬ ВСЕГДА В ПРАВОМ ВЕРХНЕМ УГЛУ (Не конфликтуют с логотипом)
+        // ВАЖНО: ТВОИ СЛОИ! Никаких изменений текстов. Добавился слой Информации.
         L.control.layers(
             { "🗺️ Улицы": streetLayer, "🛰️ Спутник": satelliteLayer }, 
-            { "🎬 Видео": videoMarkersGroup, "🛣️ Маршруты": routeLinesGroup, "👨‍🏫 Профи": instructorsGroup }, 
+            { "🎬 Видео": videoMarkersGroup, "📍 Разборы улиц": streetPointsGroup, "❗️ Информация": infoPointsGroup, "🛣️ Маршруты": routeLinesGroup, "👨‍🏫 Инструкторы": instructorsGroup }, 
             { collapsed: true, position: 'topright' } 
         ).addTo(map);
 
-        const customIcon = L.divIcon({
+        // =========================================================
+        // НАСТРОЙКА ИКОНОК (Разные формы и размеры)
+        // =========================================================
+
+        // 1. Иконка для Видео (Квадрат со скругленными углами - rounded-lg)
+        const videoIcon = L.divIcon({
             className: 'brand-icon',
-            html: `<div class="w-10 h-10 bg-blue-600 rounded-full border-2 border-white shadow-lg flex items-center justify-center text-white text-lg">▶️</div>`,
-            iconSize: [40, 40], iconAnchor: [20, 20]
+            html: `<div class="w-7 h-7 bg-blue-600 rounded-lg border-2 border-white shadow-md flex items-center justify-center text-white text-xs">▶️</div>`,
+            iconSize: [28, 28], iconAnchor: [14, 14]
         });
 
+        // 2. Иконка для Улиц (Маленький Круг - rounded-full)
+        const streetIcon = L.divIcon({
+            className: 'brand-icon',
+            html: `<div class="w-6 h-6 bg-emerald-500 rounded-full border-[1.5px] border-white shadow-sm flex items-center justify-center text-white text-[10px]">📍</div>`,
+            iconSize: [24, 24], iconAnchor: [12, 12]
+        });
+
+        // 3. Иконка Инструктора (Средний круг, чтобы не перекрывал всё)
         const instructorIcon = L.divIcon({
             className: 'instructor-icon',
-            html: `<div class="w-10 h-10 bg-orange-500 rounded-full border-2 border-white shadow-lg flex items-center justify-center text-xl">👨‍🏫</div>`,
-            iconSize: [40, 40], iconAnchor: [20, 20]
+            html: `<div class="w-8 h-8 bg-orange-500 rounded-full border-2 border-white shadow-md flex items-center justify-center text-sm">👨‍🏫</div>`,
+            iconSize: [32, 32], iconAnchor: [16, 16]
         });
 
-        // --- ГЕНЕРАЦИЯ КАРТОЧЕК ---
-        videoPointsData.forEach((p, index) => {
-            let author = p.authorName ? `
-                <div class="mt-4 p-3 bg-gray-50 border border-gray-200 rounded-xl">
-                    <p class="text-[10px] font-bold text-gray-400 uppercase mb-1">Автор разбора:</p>
-                    <p class="text-sm font-bold text-gray-800">${p.authorName}</p>
-                    <p class="text-xs text-blue-600 font-bold mt-0.5">${p.authorPrice}</p>
-                    <a href="tel:${p.authorPhone}" class="mt-2 block w-full bg-emerald-500 text-white text-center py-2.5 rounded-lg text-xs font-bold uppercase shadow-md tracking-widest">📞 Позвонить</a>
-                </div>` : "";
-            
-            let fullScreenBtn = p.vkCode ? `<button onclick="openFullscreen(${index}, 'videoPoints')" class="w-full bg-gray-900 text-white py-3.5 mt-2 rounded-xl text-xs font-black uppercase tracking-widest shadow-lg flex justify-center items-center gap-2 active:bg-gray-700">🎦 На весь экран</button>` : "";
-
-            const html = `
-                <div class="flex flex-col">
-                    <span class="text-blue-600 text-[10px] font-black uppercase tracking-widest mb-1">Совет инструктора</span>
-                    <h3 class="font-black text-gray-900 text-xl leading-tight mb-3">${p.title}</h3>
-                    ${p.vkCode ? `<div class="video-container shadow-md">${p.vkCode}</div>` : ''}
-                    ${fullScreenBtn}
-                    <p class="text-sm text-gray-700 font-medium leading-snug mt-4">${p.description}</p>
-                    ${author}
-                    ${p.telegramLink ? `<a href="${p.telegramLink}" target="_blank" class="w-full bg-[#2AABEE] text-white py-3 rounded-xl text-xs font-black shadow-lg text-center uppercase tracking-widest mt-3 block">Обсудить в группе</a>` : ''}
-                </div>`;
-            
-            L.marker([p.lat, p.lng], {icon: customIcon}).addTo(videoMarkersGroup)
-             .on('click', () => { map.flyTo([p.lat, p.lng], 17); openSheet(html); });
+        // 4. Иконка для Информации (Фиолетовый круг с восклицательным знаком)
+        const infoIcon = L.divIcon({
+            className: 'brand-icon',
+            html: `<div class="w-8 h-8 bg-purple-600 rounded-full border-2 border-white shadow-md flex items-center justify-center text-white font-bold text-sm">!</div>`,
+            iconSize: [32, 32], iconAnchor: [16, 16]
         });
 
-        routeLinesData.forEach((r, index) => {
-            const line = L.polyline(r.coordinates, { color: '#10B981', weight: 8 }).addTo(routeLinesGroup);
-            let fullScreenBtn = r.vkCode ? `<button onclick="openFullscreen(${index}, 'routeLines')" class="w-full bg-gray-900 text-white py-3.5 mt-2 rounded-xl text-xs font-black uppercase tracking-widest shadow-lg flex justify-center items-center gap-2 active:bg-gray-700">🎦 На весь экран</button>` : "";
+        // --- ГЕНЕРАЦИЯ КАРТОЧЕК И СПИСКА ---
+        let menuHTML = '';
 
-            const html = `
-                <div class="flex flex-col">
-                    <span class="text-emerald-600 text-[10px] font-black uppercase tracking-widest mb-1">Проезд участка</span>
-                    <h3 class="font-black text-gray-900 text-xl leading-tight mb-3">${r.title}</h3>
-                    ${r.vkCode ? `<div class="video-container shadow-md">${r.vkCode}</div>` : ''}
-                    ${fullScreenBtn}
-                    <p class="text-sm text-gray-700 font-medium leading-snug mt-4">${r.description}</p>
-                </div>`;
+        // 1. ВИДЕО ТОЧКИ
+        if (videoPointsData.length > 0) {
+            menuHTML += `<h3 class="font-bold text-gray-400 text-[10px] uppercase tracking-widest mb-2 mt-2">🎬 Разборы перекрестков</h3><div class="flex flex-col gap-2 mb-4">`;
             
-            line.on('click', (e) => { map.flyTo(e.latlng, 17); openSheet(html); });
-        });
+            videoPointsData.forEach((p, index) => {
+                let author = p.authorName ? `
+                    <div class="mt-4 p-3 bg-gray-50 border border-gray-200 rounded-xl">
+                        <p class="text-[10px] font-bold text-gray-400 uppercase mb-1">Автор разбора:</p>
+                        <p class="text-sm font-bold text-gray-800">${p.authorName}</p>
+                        <p class="text-xs text-blue-600 font-bold mt-0.5">${p.authorPrice}</p>
+                        <a href="tel:${p.authorPhone}" class="mt-2 block w-full bg-emerald-500 text-white text-center py-2.5 rounded-lg text-xs font-bold uppercase shadow-md tracking-widest">📞 Позвонить</a>
+                    </div>` : "";
+                
+                let fullScreenBtn = p.vkCode ? `<button onclick="openFullscreen(${index}, 'videoPoints')" class="w-full bg-gray-900 text-white py-3.5 mt-2 rounded-xl text-xs font-black uppercase tracking-widest shadow-lg flex justify-center items-center gap-2 active:bg-gray-700">🎦 На весь экран</button>` : "";
 
-        instructorsData.forEach(i => {
+                const html = `
+                    <div class="flex flex-col">
+                        <span class="text-blue-600 text-[10px] font-black uppercase tracking-widest mb-1">Совет инструктора</span>
+                        <h3 class="font-black text-gray-900 text-xl leading-tight mb-3">${p.title}</h3>
+                        ${p.vkCode ? `<div class="video-container shadow-md">${p.vkCode}</div>` : ''}
+                        ${fullScreenBtn}
+                        <p class="text-sm text-gray-700 font-medium leading-snug mt-4">${p.description}</p>
+                        ${author}
+                        ${p.telegramLink ? `<a href="${p.telegramLink}" target="_blank" class="w-full bg-[#2AABEE] text-white py-3 rounded-xl text-xs font-black shadow-lg text-center uppercase tracking-widest mt-3 block">Обсудить в группе</a>` : ''}
+                    </div>`;
+                
+                const cacheId = 'video_' + index;
+                sheetCache[cacheId] = html;
+
+                // ВАЖНО: Используем новую иконку videoIcon
+                L.marker([p.lat, p.lng], {icon: videoIcon}).addTo(videoMarkersGroup)
+                 .bindTooltip(p.title, { direction: 'top', offset: [0, -10], className: 'custom-tooltip' })
+                 .on('click', () => { map.flyTo([p.lat, p.lng], 17); openSheet(html); });
+
+                menuHTML += `<button onclick="flyToPoint(${p.lat}, ${p.lng}, '${cacheId}')" class="w-full text-left bg-white p-3 rounded-xl border border-gray-100 shadow-sm hover:border-blue-300 hover:shadow-md transition group"><div class="font-bold text-gray-800 text-sm group-hover:text-blue-600">${p.title}</div><div class="text-[10px] text-gray-400 mt-1 truncate">${p.description}</div></button>`;
+            });
+            menuHTML += `</div>`;
+        }
+
+        // 3. ИНФОРМАЦИЯ
+        if (infoPointsData.length > 0) {
+            menuHTML += `<h3 class="font-bold text-gray-400 text-[10px] uppercase tracking-widest mb-2 mt-2">❗️ Справка и документы</h3><div class="flex flex-col gap-2 mb-4">`;
+            
+            infoPointsData.forEach((p, index) => {
+                // Если есть фото
+                let mediaHtml = '';
+                if (p.imageUrl) {
+                    mediaHtml += `<img src="${p.imageUrl}" alt="Инфо" class="w-full h-auto mt-2 rounded-lg shadow-sm border border-gray-100 object-cover">`;
+                }
+
+                // Если есть кнопки (PDF или телефон)
+                let linksHtml = '';
+                if (p.fileUrl) {
+                    linksHtml += `<a href="${p.fileUrl}" target="_blank" class="w-full bg-indigo-50 text-indigo-700 text-center py-2.5 rounded-lg text-xs font-bold uppercase shadow-sm mt-2 block border border-indigo-200 hover:bg-indigo-100 transition">📄 Открыть документ</a>`;
+                }
+                if (p.phone) {
+                    linksHtml += `<a href="tel:${p.phone}" class="w-full bg-emerald-50 text-emerald-700 text-center py-2.5 rounded-lg text-xs font-bold uppercase shadow-sm mt-2 block border border-emerald-200 hover:bg-emerald-100 transition">📞 Позвонить</a>`;
+                }
+
+                const html = `
+                    <div class="flex flex-col">
+                        <span class="text-purple-600 text-[10px] font-black uppercase tracking-widest mb-1">Справка</span>
+                        <h3 class="font-black text-gray-900 text-xl leading-tight mb-2">${p.title}</h3>
+                        ${mediaHtml}
+                        <p class="text-sm text-gray-700 font-medium leading-snug mt-3">${p.description}</p>
+                        ${linksHtml}
+                    </div>`;
+                
+                const cacheId = 'info_' + index;
+                sheetCache[cacheId] = html;
+
+                L.marker([p.lat, p.lng], {icon: infoIcon}).addTo(infoPointsGroup)
+                 .bindTooltip(p.title, { direction: 'top', offset: [0, -10], className: 'custom-tooltip' })
+                 .on('click', () => { map.flyTo([p.lat, p.lng], 17); openSheet(html); });
+
+                menuHTML += `<button onclick="flyToPoint(${p.lat}, ${p.lng}, '${cacheId}')" class="w-full text-left bg-white p-3 rounded-xl border border-gray-100 shadow-sm hover:border-purple-300 hover:shadow-md transition group"><div class="font-bold text-gray-800 text-sm group-hover:text-purple-600">${p.title}</div><div class="text-[10px] text-gray-400 mt-1 truncate">${p.description}</div></button>`;
+            });
+            menuHTML += `</div>`;
+        }
+
+        // 4. МАРШРУТЫ
+        if (routeLinesData.length > 0) {
+            menuHTML += `<h3 class="font-bold text-gray-400 text-[10px] uppercase tracking-widest mb-2 mt-2">🛣️ Маршруты</h3><div class="flex flex-col gap-2 mb-4">`;
+            
+            routeLinesData.forEach((r, index) => {
+                const line = L.polyline(r.coordinates, { color: '#10B981', weight: 8 }).addTo(routeLinesGroup);
+                let fullScreenBtn = r.vkCode ? `<button onclick="openFullscreen(${index}, 'routeLines')" class="w-full bg-gray-900 text-white py-3.5 mt-2 rounded-xl text-xs font-black uppercase tracking-widest shadow-lg flex justify-center items-center gap-2 active:bg-gray-700">🎦 На весь экран</button>` : "";
+
+                const html = `
+                    <div class="flex flex-col">
+                        <span class="text-emerald-600 text-[10px] font-black uppercase tracking-widest mb-1">Проезд участка</span>
+                        <h3 class="font-black text-gray-900 text-xl leading-tight mb-3">${r.title}</h3>
+                        ${r.vkCode ? `<div class="video-container shadow-md">${r.vkCode}</div>` : ''}
+                        ${fullScreenBtn}
+                        <p class="text-sm text-gray-700 font-medium leading-snug mt-4">${r.description}</p>
+                    </div>`;
+                
+                const cacheId = 'route_' + index;
+                sheetCache[cacheId] = html;
+
+                line.bindTooltip(r.title, { sticky: true, className: 'custom-tooltip' });
+                line.on('click', (e) => { map.flyTo(e.latlng, 17); openSheet(html); });
+
+                const startLat = r.coordinates[0][0];
+                const startLng = r.coordinates[0][1];
+
+                menuHTML += `<button onclick="flyToPoint(${startLat}, ${startLng}, '${cacheId}')" class="w-full text-left bg-white p-3 rounded-xl border border-gray-100 shadow-sm hover:border-emerald-300 hover:shadow-md transition group"><div class="font-bold text-gray-800 text-sm group-hover:text-emerald-600">${r.title}</div><div class="text-[10px] text-gray-400 mt-1 truncate">${r.description}</div></button>`;
+            });
+            menuHTML += `</div>`;
+        }
+
+        // 4. ИНСТРУКТОРЫ
+        instructorsData.forEach((i, index) => {
             const html = `
                 <div class="flex flex-col">
                     <div class="flex gap-4 items-center mb-4">
@@ -382,8 +458,11 @@
                 </div>`;
             
             L.marker([i.lat, i.lng], {icon: instructorIcon}).addTo(instructorsGroup)
+             .bindTooltip(i.name, { direction: 'top', offset: [0, -10], className: 'custom-tooltip' })
              .on('click', () => { map.flyTo([i.lat, i.lng], 17); openSheet(html); });
         });
+
+        document.getElementById('menuContent').innerHTML = menuHTML;
 
     </script>
 </body>
