@@ -123,7 +123,7 @@
             }
         ];
 
-        // 2. УЛИЦЫ: Все твои новые точки выделены в отдельную группу!
+        // 2. УЛИЦЫ: Все твои новые точки в целости и сохранности!
         const streetPointsData = [
             {
                 lat: 57.59012, lng: 39.85937, title: "улица Гагарина", description: "ул. Гагарина от Московского проспекта до ул. Нефтяников", telegramLink: "", authorName: "", authorPhone: "", authorPrice: "0",
@@ -197,7 +197,7 @@
             },
         ];
 
-        // 4. ИНСТРУКТОРЫ
+        // 5. ИНСТРУКТОРЫ
         const instructorsData = [
             {
                 lat: 57.5855, lng: 39.8500,
@@ -306,7 +306,7 @@
             iconSize: [24, 24], iconAnchor: [12, 12]
         });
 
-        // 3. Иконка Инструктора (Средний круг, чтобы не перекрывал всё)
+        // 3. Иконка Инструктора (Средний круг)
         const instructorIcon = L.divIcon({
             className: 'instructor-icon',
             html: `<div class="w-8 h-8 bg-orange-500 rounded-full border-2 border-white shadow-md flex items-center justify-center text-sm">👨‍🏫</div>`,
@@ -352,7 +352,7 @@
                 const cacheId = 'video_' + index;
                 sheetCache[cacheId] = html;
 
-                // ВАЖНО: Используем новую иконку videoIcon
+                // Используем правильную иконку videoIcon
                 L.marker([p.lat, p.lng], {icon: videoIcon}).addTo(videoMarkersGroup)
                  .bindTooltip(p.title, { direction: 'top', offset: [0, -10], className: 'custom-tooltip' })
                  .on('click', () => { map.flyTo([p.lat, p.lng], 17); openSheet(html); });
@@ -362,18 +362,45 @@
             menuHTML += `</div>`;
         }
 
+        // 2. УЛИЦЫ
+        if (streetPointsData.length > 0) {
+            menuHTML += `<h3 class="font-bold text-gray-400 text-[10px] uppercase tracking-widest mb-2 mt-2">📍 Разборы улиц</h3><div class="flex flex-col gap-2 mb-4">`;
+            
+            streetPointsData.forEach((p, index) => {
+                let fullScreenBtn = p.vkCode ? `<button onclick="openFullscreen(${index}, 'streetPoints')" class="w-full bg-gray-900 text-white py-3.5 mt-2 rounded-xl text-xs font-black uppercase tracking-widest shadow-lg flex justify-center items-center gap-2 active:bg-gray-700">🎦 На весь экран</button>` : "";
+
+                const html = `
+                    <div class="flex flex-col">
+                        <span class="text-emerald-600 text-[10px] font-black uppercase tracking-widest mb-1">Проезд участка</span>
+                        <h3 class="font-black text-gray-900 text-xl leading-tight mb-3">${p.title}</h3>
+                        ${p.vkCode ? `<div class="video-container shadow-md">${p.vkCode}</div>` : ''}
+                        ${fullScreenBtn}
+                        <p class="text-sm text-gray-700 font-medium leading-snug mt-4">${p.description}</p>
+                    </div>`;
+                
+                const cacheId = 'street_' + index;
+                sheetCache[cacheId] = html;
+
+                // Используем правильную иконку streetIcon
+                L.marker([p.lat, p.lng], {icon: streetIcon}).addTo(streetPointsGroup)
+                 .bindTooltip(p.title, { direction: 'top', offset: [0, -10], className: 'custom-tooltip' })
+                 .on('click', () => { map.flyTo([p.lat, p.lng], 17); openSheet(html); });
+
+                menuHTML += `<button onclick="flyToPoint(${p.lat}, ${p.lng}, '${cacheId}')" class="w-full text-left bg-white p-3 rounded-xl border border-gray-100 shadow-sm hover:border-emerald-300 hover:shadow-md transition group"><div class="font-bold text-gray-800 text-sm group-hover:text-emerald-600">${p.title}</div><div class="text-[10px] text-gray-400 mt-1 truncate">${p.description}</div></button>`;
+            });
+            menuHTML += `</div>`;
+        }
+
         // 3. ИНФОРМАЦИЯ
         if (infoPointsData.length > 0) {
             menuHTML += `<h3 class="font-bold text-gray-400 text-[10px] uppercase tracking-widest mb-2 mt-2">❗️ Справка и документы</h3><div class="flex flex-col gap-2 mb-4">`;
             
             infoPointsData.forEach((p, index) => {
-                // Если есть фото
                 let mediaHtml = '';
                 if (p.imageUrl) {
                     mediaHtml += `<img src="${p.imageUrl}" alt="Инфо" class="w-full h-auto mt-2 rounded-lg shadow-sm border border-gray-100 object-cover">`;
                 }
 
-                // Если есть кнопки (PDF или телефон)
                 let linksHtml = '';
                 if (p.fileUrl) {
                     linksHtml += `<a href="${p.fileUrl}" target="_blank" class="w-full bg-indigo-50 text-indigo-700 text-center py-2.5 rounded-lg text-xs font-bold uppercase shadow-sm mt-2 block border border-indigo-200 hover:bg-indigo-100 transition">📄 Открыть документ</a>`;
@@ -394,6 +421,7 @@
                 const cacheId = 'info_' + index;
                 sheetCache[cacheId] = html;
 
+                // Используем правильную иконку infoIcon
                 L.marker([p.lat, p.lng], {icon: infoIcon}).addTo(infoPointsGroup)
                  .bindTooltip(p.title, { direction: 'top', offset: [0, -10], className: 'custom-tooltip' })
                  .on('click', () => { map.flyTo([p.lat, p.lng], 17); openSheet(html); });
@@ -434,7 +462,7 @@
             menuHTML += `</div>`;
         }
 
-        // 4. ИНСТРУКТОРЫ
+        // 5. ИНСТРУКТОРЫ
         instructorsData.forEach((i, index) => {
             const html = `
                 <div class="flex flex-col">
