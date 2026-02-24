@@ -26,26 +26,20 @@
         .video-container { position: relative; padding-bottom: 56.25%; height: 0; overflow: hidden; background-color: #000; border-radius: 8px; }
         .video-container iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; }
         
-        .brand-icon, .instructor-icon { background: none; border: none; }
+        .brand-icon, .instructor-icon, .sign-icon { background: none; border: none; }
         .leaflet-control-layers { border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.15) !important; border: none !important; margin: 12px !important;}
         
-        /* Скрываем стандартные Leaflet Popups */
         .leaflet-popup { display: none !important; }
 
-        /* Тултипы (всплывающие названия над иконками) */
-        .custom-tooltip { background-color: rgba(255, 255, 255, 0.95); border: none; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); font-weight: bold; color: #1f2937; font-size: 11px; padding: 4px 8px; }
+        .custom-tooltip { background-color: rgba(255, 255, 255, 0.95); border: none; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); font-weight: bold; color: #1f2937; font-size: 11px; padding: 4px 8px; z-index: 1000; }
         .leaflet-tooltip-top:before { border-top-color: rgba(255, 255, 255, 0.95); }
 
-        /* Кастомный скроллбар */
         ::-webkit-scrollbar { width: 4px; }
         ::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 4px; }
     </style>
 </head>
 <body>
 
-    <!-- ======================================================= -->
-    <!-- АДАПТИВНЫЙ ЛОГОТИП (Левый верхний угол)                 -->
-    <!-- ======================================================= -->
     <div class="absolute top-3 left-3 z-[1000] bg-white/95 backdrop-blur-md rounded-2xl shadow-lg flex items-center border-l-4 border-blue-600 overflow-hidden transition-all duration-300 pointer-events-auto">
         <div class="bg-blue-100 px-3 py-2 text-blue-700 font-black text-xl leading-none italic">76</div>
         <div class="px-4 py-2 hidden sm:flex flex-col">
@@ -54,14 +48,12 @@
         </div>
     </div>
 
-    <!-- КНОПКА ОТКРЫТИЯ СПИСКА (НАВИГАТОРА) -->
     <div class="absolute top-[80px] left-3 z-[1000] pointer-events-auto">
         <button onclick="openMenu()" class="bg-white/95 backdrop-blur-md text-gray-800 px-4 py-2 rounded-xl shadow-[0_4px_10px_rgba(0,0,0,0.15)] font-bold text-xs uppercase tracking-wider flex items-center gap-2 border border-gray-100 hover:bg-gray-50 transition">
             📋 Список
         </button>
     </div>
 
-    <!-- МЕНЮ НАВИГАЦИИ (List View) -->
     <div id="navMenu" class="fixed inset-y-0 right-0 z-[4000] w-full sm:w-80 bg-white shadow-2xl transform translate-x-full transition-transform duration-300 ease-in-out flex flex-col">
         <div class="bg-blue-600 p-4 flex justify-between items-center shrink-0">
             <h2 class="text-white font-black text-sm uppercase tracking-widest">📍 Доступные разборы</h2>
@@ -72,9 +64,6 @@
         </div>
     </div>
 
-    <!-- ======================================================= -->
-    <!-- ВЫДВИЖНАЯ ПАНЕЛЬ (Bottom Sheet)                         -->
-    <!-- ======================================================= -->
     <div id="bottomSheet" class="fixed inset-x-0 bottom-0 z-[2000] bg-white rounded-t-3xl shadow-[0_-10px_40px_rgba(0,0,0,0.2)] transform translate-y-full transition-transform duration-300 ease-out flex flex-col max-h-[75vh] sm:max-w-md sm:mx-auto sm:mb-4 sm:rounded-3xl sm:inset-x-4">
         <div class="w-full flex justify-center pt-3 pb-2 cursor-pointer shrink-0 relative" onclick="closeSheet()">
             <div class="w-12 h-1.5 bg-gray-300 rounded-full"></div>
@@ -85,9 +74,6 @@
         </div>
     </div>
 
-    <!-- ======================================================= -->
-    <!-- КИНОТЕАТР (Полноэкранное видео)                         -->
-    <!-- ======================================================= -->
     <div id="videoModal" class="fixed inset-0 z-[3000] bg-black hidden flex-col justify-center items-center">
         <button onclick="closeFullscreen()" class="absolute top-6 right-6 text-white text-3xl w-12 h-12 bg-white/20 backdrop-blur-md rounded-full flex justify-center items-center focus:outline-none shadow-lg z-50">&times;</button>
         <div class="w-full max-w-5xl">
@@ -100,20 +86,18 @@
     <div id="map"></div>
 
     <script>
-        // --- 🗄️ БАЗА ДАННЫХ ---
+        // =========================================================================
+        // 🗄️ БАЗА ДАННЫХ
+        // =========================================================================
         
-        // 1. ВИДЕО: Перекрестки и сложные участки
         const videoPointsData = [
             {
-    lat: 57.58737, lng: 39.85002,
-    title: "выезд со стоянки",
-    description: "",
-    telegramLink: "",
-    authorName: "",
-    authorPhone: "",
-    authorPrice: "",
-    vkCode: `<iframe src="https://vkvideo.ru/video_ext.php?oid=-236190441&id=456239017&hash=8e2ed08c09146173&hd=3" width="1280" height="720" allow="autoplay; encrypted-media; fullscreen; picture-in-picture; screen-wake-lock;" frameborder="0" allowfullscreen></iframe>`
-},
+                lat: 57.5871, lng: 39.8515,
+                title: "Разбор перекрестка у Арены",
+                description: "Посмотри этот короткий видео-разбор, чтобы уверенно проехать перекресток и не завалить экзамен!",
+                telegramLink: "https://t.me/bez_dtp",
+                vkCode: `<iframe src="https://vkvideo.ru/video_ext.php?oid=-236190441&id=456239017&hash=8e2ed08c09146173&hd=3" allow="autoplay; encrypted-media; fullscreen; picture-in-picture;" allowfullscreen></iframe>`
+            },
             {
                 lat: 57.58718, lng: 39.85072,
                 title: "Разбор от Евгения Чернышева",
@@ -126,71 +110,41 @@
             }
         ];
 
-        // 2. УЛИЦЫ: Все твои новые точки в целости и сохранности!
         const streetPointsData = [
-            {
-                lat: 57.59012, lng: 39.85937, title: "улица Гагарина", description: "ул. Гагарина от Московского проспекта до ул. Нефтяников", telegramLink: "", authorName: "", authorPhone: "", authorPrice: "0",
-                vkCode: `<iframe src="https://vkvideo.ru/video_ext.php?oid=-236190441&id=456239018&hash=0783681156dd1f26&hd=3" allow="autoplay; encrypted-media; fullscreen; picture-in-picture;" allowfullscreen></iframe>`
-            },
-            {
-                lat: 57.58481, lng: 39.83561, title: "улица Менделеева", description: "от ул. Титова до ул. Курчатова", telegramLink: "", authorName: "", authorPhone: "", authorPrice: "0",
-                vkCode: `<iframe src="https://vkvideo.ru/video_ext.php?oid=-236190441&id=456239021&hash=2c0ea19bd41c438f&hd=3" width="1280" height="720" allow="autoplay; encrypted-media; fullscreen; picture-in-picture; screen-wake-lock;" frameborder="0" allowfullscreen></iframe>`
-            },
-            {
-                lat: 57.58150, lng: 39.85189, title: "улица Павлова", description: "ул. Павлова от Московского проспекта и обратно", telegramLink: "", authorName: "", authorPhone: "", authorPrice: "0",
-                vkCode: `<iframe src="https://vkvideo.ru/video_ext.php?oid=-236190441&id=456239020&hash=139d4be0f98d6870&hd=3" width="1280" height="720" allow="autoplay; encrypted-media; fullscreen; picture-in-picture; screen-wake-lock;" frameborder="0" allowfullscreen></iframe>`
-            },
-            {
-                lat: 57.58063, lng: 39.83475, title: "улица Гагарина", description: "ул. Гагарина от ул. Нефтяников", telegramLink: "", authorName: "", authorPhone: "", authorPrice: "0",
-                vkCode: `<iframe src="https://vkvideo.ru/video_ext.php?oid=-236190441&id=456239019&hash=577b062e3ec1bd18&hd=3" width="1280" height="720" allow="autoplay; encrypted-media; fullscreen; picture-in-picture; screen-wake-lock;" frameborder="0" allowfullscreen></iframe>`
-            },
-            {
-                lat: 57.58062, lng: 39.83484, title: "улица Нефтяников", description: "от ул. Гагарина до Московского проспекта", telegramLink: "", authorName: "", authorPhone: "", authorPrice: "0",
-                vkCode: `<iframe src="https://vkvideo.ru/video_ext.php?oid=-236190441&id=456239029&hash=fc76b1ebf8a304e1&hd=3" width="1280" height="720" allow="autoplay; encrypted-media; fullscreen; picture-in-picture; screen-wake-lock;" frameborder="0" allowfullscreen></iframe>`
-            },
-            {
-                lat: 57.57651, lng: 39.84514, title: "улица Нефтяников", description: "от Московского проспекта до ул. Гагарина", telegramLink: "", authorName: "", authorPhone: "", authorPrice: "0",
-                vkCode: `<iframe src="https://vkvideo.ru/video_ext.php?oid=-236190441&id=456239028&hash=0c72141f6e801cb6&hd=3" width="1280" height="720" allow="autoplay; encrypted-media; fullscreen; picture-in-picture; screen-wake-lock;" frameborder="0" allowfullscreen></iframe>`
-            },
-            {
-                lat: 57.58683, lng: 39.83844, title: "улица Титова", description: "от ул. Павлова до ул. Рыкачева", telegramLink: "", authorName: "", authorPhone: "", authorPrice: "0",
-                vkCode: `<iframe src="https://vkvideo.ru/video_ext.php?oid=-236190441&id=456239027&hash=edd7df047f99efc3&hd=3" width="1280" height="720" allow="autoplay; encrypted-media; fullscreen; picture-in-picture; screen-wake-lock;" frameborder="0" allowfullscreen></iframe>`
-            },
-            {
-                lat: 57.58162, lng: 39.83596, title: "улица Рыкачева, Титова", description: "от ул. Гагарина до  ул. Павлова ", telegramLink: "", authorName: "", authorPhone: "", authorPrice: "0",
-                vkCode: `<iframe src="https://vkvideo.ru/video_ext.php?oid=-236190441&id=456239026&hash=f5fdfc80ffffe7e9&hd=3" width="1280" height="720" allow="autoplay; encrypted-media; fullscreen; picture-in-picture; screen-wake-lock;" frameborder="0" allowfullscreen></iframe>`
-            },
-            {
-                lat: 57.58268, lng: 39.83298, title: "улица Рыкачева", description: "от ул. Титова до  ул. Курчатова", telegramLink: "", authorName: "", authorPhone: "", authorPrice: "0",
-                vkCode: `<iframe src="https://vkvideo.ru/video_ext.php?oid=-236190441&id=456239022&hash=bfcc6e06b9732cc5&hd=3" width="1280" height="720" allow="autoplay; encrypted-media; fullscreen; picture-in-picture; screen-wake-lock;" frameborder="0" allowfullscreen></iframe>`
-            },
-            {
-                lat: 57.58263, lng: 39.84903, title: "улица Курчатова", description: "от ул. Павлова до  ул. Рыкачева", telegramLink: "", authorName: "", authorPhone: "", authorPrice: "0",
-                vkCode: `<iframe src="https://vkvideo.ru/video_ext.php?oid=-236190441&id=456239024&hash=1ddb1e564ad42f2d&hd=3" width="1280" height="720" allow="autoplay; encrypted-media; fullscreen; picture-in-picture; screen-wake-lock;" frameborder="0" allowfullscreen></iframe>`
-            },
-            {
-                lat: 57.57861, lng: 39.84353, title: "улица Рыкачева, Майорова", description: "от ул. Курчатова до  ул. Менделеева", telegramLink: "", authorName: "", authorPhone: "", authorPrice: "0",
-                vkCode: `<iframe src="https://vkvideo.ru/video_ext.php?oid=-236190441&id=456239023&hash=26ae89e6ca1fdb7f&hd=3" width="1280" height="720" allow="autoplay; encrypted-media; fullscreen; picture-in-picture; screen-wake-lock;" frameborder="0" allowfullscreen></iframe>`
-            },
-            {
-                lat: 57.57862, lng: 39.84344, title: "улица Курчатова", description: "от ул. Рыкачева до  ул. Павлова", telegramLink: "", authorName: "", authorPhone: "", authorPrice: "0",
-                vkCode: `<iframe src="https://vkvideo.ru/video_ext.php?oid=-236190441&id=456239025&hash=a8e5a6380f9b53f1&hd=3" width="1280" height="720" allow="autoplay; encrypted-media; fullscreen; picture-in-picture; screen-wake-lock;" frameborder="0" allowfullscreen></iframe>`
-            }
+            { lat: 57.59012, lng: 39.85937, title: "улица Гагарина", description: "ул. Гагарина от Московского проспекта до ул. Нефтяников", telegramLink: "", authorName: "", authorPhone: "", authorPrice: "0", vkCode: `<iframe src="https://vkvideo.ru/video_ext.php?oid=-236190441&id=456239018&hash=0783681156dd1f26&hd=3" allow="autoplay; encrypted-media; fullscreen; picture-in-picture;" allowfullscreen></iframe>` },
+            { lat: 57.58481, lng: 39.83561, title: "улица Менделеева", description: "от ул. Титова до ул. Курчатова", telegramLink: "", authorName: "", authorPhone: "", authorPrice: "0", vkCode: `<iframe src="https://vkvideo.ru/video_ext.php?oid=-236190441&id=456239021&hash=2c0ea19bd41c438f&hd=3" width="1280" height="720" allow="autoplay; encrypted-media; fullscreen; picture-in-picture; screen-wake-lock;" frameborder="0" allowfullscreen></iframe>` },
+            { lat: 57.58150, lng: 39.85189, title: "улица Павлова", description: "ул. Павлова от Московского проспекта и обратно", telegramLink: "", authorName: "", authorPhone: "", authorPrice: "0", vkCode: `<iframe src="https://vkvideo.ru/video_ext.php?oid=-236190441&id=456239020&hash=139d4be0f98d6870&hd=3" width="1280" height="720" allow="autoplay; encrypted-media; fullscreen; picture-in-picture; screen-wake-lock;" frameborder="0" allowfullscreen></iframe>` },
+            { lat: 57.58063, lng: 39.83475, title: "улица Гагарина", description: "ул. Гагарина от ул. Нефтяников", telegramLink: "", authorName: "", authorPhone: "", authorPrice: "0", vkCode: `<iframe src="https://vkvideo.ru/video_ext.php?oid=-236190441&id=456239019&hash=577b062e3ec1bd18&hd=3" width="1280" height="720" allow="autoplay; encrypted-media; fullscreen; picture-in-picture; screen-wake-lock;" frameborder="0" allowfullscreen></iframe>` },
+            { lat: 57.58062, lng: 39.83484, title: "улица Нефтяников", description: "от ул. Гагарина до Московского проспекта", telegramLink: "", authorName: "", authorPhone: "", authorPrice: "0", vkCode: `<iframe src="https://vkvideo.ru/video_ext.php?oid=-236190441&id=456239029&hash=fc76b1ebf8a304e1&hd=3" width="1280" height="720" allow="autoplay; encrypted-media; fullscreen; picture-in-picture; screen-wake-lock;" frameborder="0" allowfullscreen></iframe>` },
+            { lat: 57.57651, lng: 39.84514, title: "улица Нефтяников", description: "от Московского проспекта до ул. Гагарина", telegramLink: "", authorName: "", authorPhone: "", authorPrice: "0", vkCode: `<iframe src="https://vkvideo.ru/video_ext.php?oid=-236190441&id=456239028&hash=0c72141f6e801cb6&hd=3" width="1280" height="720" allow="autoplay; encrypted-media; fullscreen; picture-in-picture; screen-wake-lock;" frameborder="0" allowfullscreen></iframe>` },
+            { lat: 57.58683, lng: 39.83844, title: "улица Титова", description: "от ул. Павлова до ул. Рыкачева", telegramLink: "", authorName: "", authorPhone: "", authorPrice: "0", vkCode: `<iframe src="https://vkvideo.ru/video_ext.php?oid=-236190441&id=456239027&hash=edd7df047f99efc3&hd=3" width="1280" height="720" allow="autoplay; encrypted-media; fullscreen; picture-in-picture; screen-wake-lock;" frameborder="0" allowfullscreen></iframe>` },
+            { lat: 57.58162, lng: 39.83596, title: "улица Рыкачева, Титова", description: "от ул. Гагарина до  ул. Павлова ", telegramLink: "", authorName: "", authorPhone: "", authorPrice: "0", vkCode: `<iframe src="https://vkvideo.ru/video_ext.php?oid=-236190441&id=456239026&hash=f5fdfc80ffffe7e9&hd=3" width="1280" height="720" allow="autoplay; encrypted-media; fullscreen; picture-in-picture; screen-wake-lock;" frameborder="0" allowfullscreen></iframe>` },
+            { lat: 57.58268, lng: 39.83298, title: "улица Рыкачева", description: "от ул. Титова до  ул. Курчатова", telegramLink: "", authorName: "", authorPhone: "", authorPrice: "0", vkCode: `<iframe src="https://vkvideo.ru/video_ext.php?oid=-236190441&id=456239022&hash=bfcc6e06b9732cc5&hd=3" width="1280" height="720" allow="autoplay; encrypted-media; fullscreen; picture-in-picture; screen-wake-lock;" frameborder="0" allowfullscreen></iframe>` },
+            { lat: 57.58263, lng: 39.84903, title: "улица Курчатова", description: "от ул. Павлова до  ул. Рыкачева", telegramLink: "", authorName: "", authorPhone: "", authorPrice: "0", vkCode: `<iframe src="https://vkvideo.ru/video_ext.php?oid=-236190441&id=456239024&hash=1ddb1e564ad42f2d&hd=3" width="1280" height="720" allow="autoplay; encrypted-media; fullscreen; picture-in-picture; screen-wake-lock;" frameborder="0" allowfullscreen></iframe>` },
+            { lat: 57.57861, lng: 39.84353, title: "улица Рыкачева, Майорова", description: "от ул. Курчатова до  ул. Менделеева", telegramLink: "", authorName: "", authorPhone: "", authorPrice: "0", vkCode: `<iframe src="https://vkvideo.ru/video_ext.php?oid=-236190441&id=456239023&hash=26ae89e6ca1fdb7f&hd=3" width="1280" height="720" allow="autoplay; encrypted-media; fullscreen; picture-in-picture; screen-wake-lock;" frameborder="0" allowfullscreen></iframe>` },
+            { lat: 57.57862, lng: 39.84344, title: "улица Курчатова", description: "от ул. Рыкачева до  ул. Павлова", telegramLink: "", authorName: "", authorPhone: "", authorPrice: "0", vkCode: `<iframe src="https://vkvideo.ru/video_ext.php?oid=-236190441&id=456239025&hash=a8e5a6380f9b53f1&hd=3" width="1280" height="720" allow="autoplay; encrypted-media; fullscreen; picture-in-picture; screen-wake-lock;" frameborder="0" allowfullscreen></iframe>` }
         ];
 
-        // 3. ИНФОРМАЦИЯ (Новый слой: экзамены, документы, справки)
         const infoPointsData = [
             {
-                lat: 57.5880, lng: 39.8520, // Пример точки у Арены (можешь потом удалить)
+                lat: 57.5880, lng: 39.8520, 
                 title: "Документы для экзамена",
                 description: "Для допуска к экзамену в ГИБДД при себе необходимо иметь паспорт и квитанцию об оплате госпошлины.",
-                imageUrl: "", // Сюда вставляется ссылка на фото (jpg/png), если нужно
-                fileUrl: "",  // Сюда вставляется ссылка на PDF документ
-                phone: "+7 (4852) 11-22-33" // Если указать, появится зеленая кнопка "Позвонить"
+                imageUrl: "", fileUrl: "", phone: "+7 (4852) 11-22-33" 
             }
         ];
 
-        // 4. МАРШРУТЫ
+        // 🚦 НОВЫЙ МАССИВ: ДОРОЖНЫЕ ЗНАКИ (Добавлен знак "Уступи дорогу")
+        const signsData = [
+            { lat: 57.5891, lng: 39.8485, type: 'no_stop', title: "Остановка запрещена", description: "На этом участке парковаться нельзя, сразу несдача!" },
+            { lat: 57.5880, lng: 39.8500, type: 'speed40', title: "Ограничение 40 км/ч", description: "Зона действия знака до следующего перекрестка." },
+            { lat: 57.5875, lng: 39.8517, type: 'speed20', title: "Ограничение 20 км/ч", description: "Внимание, пешеходный переход рядом." },
+            { lat: 57.5861, lng: 39.8545, type: 'main_road', title: "Главная дорога", description: "У нас приоритет на этом перекрестке." },
+            { lat: 57.5885, lng: 39.8495, type: 'stop', title: "Движение без остановки запрещено", description: "Обязательная фиксация автомобиля! Останавливаемся у стоп-линии или края пересекаемой проезжей части." },
+            // НОВЫЙ ЗНАК "УСТУПИ ДОРОГУ"
+            { lat: 57.5878, lng: 39.8490, type: 'yield', title: "Уступи дорогу", description: "Внимательно смотрим по сторонам и уступаем всем, кто движется по главной!" }
+        ];
+
         const routeLinesData = [
             {
                 title: "Улица Гагарина",
@@ -200,7 +154,6 @@
             },
         ];
 
-        // 5. ИНСТРУКТОРЫ
         const instructorsData = [
             {
                 lat: 57.5855, lng: 39.8500,
@@ -214,14 +167,13 @@
             }
         ];
 
-        // --- ГЛОБАЛЬНЫЙ КЭШ (Best Practice для безопасного открытия окон из меню) ---
         const sheetCache = {};
 
         // --- ЛОГИКА ИНТЕРФЕЙСА ---
         function openSheet(htmlContent) {
             document.getElementById('sheetContent').innerHTML = htmlContent;
             document.getElementById('bottomSheet').classList.remove('translate-y-full');
-            closeMenu(); // Закрываем меню при открытии карточки
+            closeMenu();
         }
 
         function closeSheet() {
@@ -249,11 +201,7 @@
             
             const iframe = container.querySelector('iframe');
             if (iframe) {
-                iframe.style.position = 'absolute';
-                iframe.style.top = '0';
-                iframe.style.left = '0';
-                iframe.style.width = '100%';
-                iframe.style.height = '100%';
+                iframe.style.position = 'absolute'; iframe.style.top = '0'; iframe.style.left = '0'; iframe.style.width = '100%'; iframe.style.height = '100%';
             }
             
             document.getElementById('bottomSheet').classList.add('translate-y-full');
@@ -273,224 +221,177 @@
         const satelliteLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { maxZoom: 19 });
 
         const map = L.map('map', { center: [57.5871, 39.8515], zoom: 16, layers: [streetLayer], zoomControl: false });
-        
         map.attributionControl.setPrefix(''); 
-        
         L.control.zoom({ position: 'bottomright' }).addTo(map);
 
         const videoMarkersGroup = L.layerGroup().addTo(map);
-        const streetPointsGroup = L.layerGroup().addTo(map); // Группа для улиц
-        const infoPointsGroup = L.layerGroup().addTo(map);   // Группа для Информации
+        const streetPointsGroup = L.layerGroup().addTo(map);
+        const infoPointsGroup = L.layerGroup().addTo(map);
+        const signsGroup = L.layerGroup().addTo(map); // Группа для ЗНАКОВ
         const routeLinesGroup = L.layerGroup().addTo(map);
         const instructorsGroup = L.layerGroup().addTo(map);
 
-        // ВАЖНО: ТВОИ СЛОИ! Никаких изменений текстов. Добавился слой Информации.
         L.control.layers(
             { "🗺️ Улицы": streetLayer, "🛰️ Спутник": satelliteLayer }, 
-            { "🎬 Видео": videoMarkersGroup, "📍 Разборы улиц": streetPointsGroup, "❗️ Информация": infoPointsGroup, "🛣️ Маршруты": routeLinesGroup, "👨‍🏫 Инструкторы": instructorsGroup }, 
+            { "🎬 Видео": videoMarkersGroup, "📍 Разборы улиц": streetPointsGroup, "🚦 Знаки": signsGroup, "❗️ Информация": infoPointsGroup, "🛣️ Маршруты": routeLinesGroup, "👨‍🏫 Инструкторы": instructorsGroup }, 
             { collapsed: true, position: 'topright' } 
         ).addTo(map);
 
         // =========================================================
-        // НАСТРОЙКА ИКОНОК (Разные формы и размеры)
+        // ИКОНКИ (Tailwind CSS Shapes - Высший пилотаж!)
         // =========================================================
 
-        // 1. Иконка для Видео (Квадрат со скругленными углами - rounded-lg)
         const videoIcon = L.divIcon({
             className: 'brand-icon',
             html: `<div class="w-7 h-7 bg-blue-600 rounded-lg border-2 border-white shadow-md flex items-center justify-center text-white text-xs">▶️</div>`,
             iconSize: [28, 28], iconAnchor: [14, 14]
         });
 
-        // 2. Иконка для Улиц (Маленький Круг - rounded-full)
         const streetIcon = L.divIcon({
             className: 'brand-icon',
             html: `<div class="w-6 h-6 bg-emerald-500 rounded-full border-[1.5px] border-white shadow-sm flex items-center justify-center text-white text-[10px]">📍</div>`,
             iconSize: [24, 24], iconAnchor: [12, 12]
         });
 
-        // 3. Иконка Инструктора (Средний круг)
         const instructorIcon = L.divIcon({
             className: 'instructor-icon',
             html: `<div class="w-8 h-8 bg-orange-500 rounded-full border-2 border-white shadow-md flex items-center justify-center text-sm">👨‍🏫</div>`,
             iconSize: [32, 32], iconAnchor: [16, 16]
         });
 
-        // 4. Иконка для Информации (Фиолетовый круг с восклицательным знаком)
         const infoIcon = L.divIcon({
             className: 'brand-icon',
             html: `<div class="w-8 h-8 bg-purple-600 rounded-full border-2 border-white shadow-md flex items-center justify-center text-white font-bold text-sm">!</div>`,
             iconSize: [32, 32], iconAnchor: [16, 16]
         });
 
+        // Функция генерации иконок знаков (Добавлен Уступи дорогу)
+        function getSignIcon(type) {
+            let htmlContent = '';
+            let iSize = [28, 28]; // Базовый размер знака
+            let iAnchor = [14, 14];
+
+            const noStopHtml = `<div class="w-7 h-7 bg-blue-700 rounded-full border-[3px] border-red-600 shadow-md relative flex items-center justify-center overflow-hidden z-10"><div class="absolute w-8 h-[3px] bg-red-600 rotate-45"></div><div class="absolute w-8 h-[3px] bg-red-600 -rotate-45"></div></div>`;
+
+            if (type === 'speed40') {
+                htmlContent = `<div class="w-7 h-7 bg-white rounded-full border-[3px] border-red-600 shadow-md flex items-center justify-center font-black text-black text-[11px] leading-none tracking-tighter">40</div>`;
+            } else if (type === 'speed20') {
+                htmlContent = `<div class="w-7 h-7 bg-white rounded-full border-[3px] border-red-600 shadow-md flex items-center justify-center font-black text-black text-[11px] leading-none tracking-tighter">20</div>`;
+            } else if (type === 'main_road') {
+                htmlContent = `<div class="w-7 h-7 flex items-center justify-center drop-shadow-md"><div class="w-4 h-4 bg-yellow-400 border-[2px] border-white ring-1 ring-gray-400 transform rotate-45"></div></div>`;
+            } else if (type === 'no_stop') {
+                htmlContent = noStopHtml;
+            } else if (type === 'stop') {
+                // Векторный знак STOP
+                htmlContent = `
+                    <div class="flex items-center justify-center w-7 h-7 drop-shadow-md">
+                        <svg viewBox="0 0 100 100" class="w-full h-full">
+                            <polygon points="30,5 70,5 95,30 95,70 70,95 30,95 5,70 5,30" fill="#dc2626" stroke="white" stroke-width="4"/>
+                            <text x="50" y="54" font-family="sans-serif" font-weight="900" font-size="28" fill="white" text-anchor="middle" dominant-baseline="middle" letter-spacing="-1">STOP</text>
+                        </svg>
+                    </div>`;
+            } else if (type === 'yield') {
+                // Векторный знак УСТУПИ ДОРОГУ (Перевернутый треугольник)
+                htmlContent = `
+                    <div class="flex items-center justify-center w-7 h-7 drop-shadow-md">
+                        <svg viewBox="0 0 100 100" class="w-full h-full">
+                            <!-- Треугольник с закругленными углами -->
+                            <polygon points="5,10 95,10 50,90" fill="white" stroke="#dc2626" stroke-width="14" stroke-linejoin="round"/>
+                        </svg>
+                    </div>`;
+            }
+
+            return L.divIcon({
+                className: 'sign-icon',
+                html: htmlContent,
+                iconSize: iSize,
+                iconAnchor: iAnchor
+            });
+        }
+
         // --- ГЕНЕРАЦИЯ КАРТОЧЕК И СПИСКА ---
         let menuHTML = '';
 
-        // 1. ВИДЕО ТОЧКИ
         if (videoPointsData.length > 0) {
             menuHTML += `<h3 class="font-bold text-gray-400 text-[10px] uppercase tracking-widest mb-2 mt-2">🎬 Разборы перекрестков</h3><div class="flex flex-col gap-2 mb-4">`;
-            
             videoPointsData.forEach((p, index) => {
-                let author = p.authorName ? `
-                    <div class="mt-4 p-3 bg-gray-50 border border-gray-200 rounded-xl">
-                        <p class="text-[10px] font-bold text-gray-400 uppercase mb-1">Автор разбора:</p>
-                        <p class="text-sm font-bold text-gray-800">${p.authorName}</p>
-                        <p class="text-xs text-blue-600 font-bold mt-0.5">${p.authorPrice}</p>
-                        <a href="tel:${p.authorPhone}" class="mt-2 block w-full bg-emerald-500 text-white text-center py-2.5 rounded-lg text-xs font-bold uppercase shadow-md tracking-widest">📞 Позвонить</a>
-                    </div>` : "";
-                
+                let author = p.authorName ? `<div class="mt-4 p-3 bg-gray-50 border border-gray-200 rounded-xl"><p class="text-[10px] font-bold text-gray-400 uppercase mb-1">Автор разбора:</p><p class="text-sm font-bold text-gray-800">${p.authorName}</p><p class="text-xs text-blue-600 font-bold mt-0.5">${p.authorPrice}</p><a href="tel:${p.authorPhone}" class="mt-2 block w-full bg-emerald-500 text-white text-center py-2.5 rounded-lg text-xs font-bold uppercase shadow-md tracking-widest">📞 Позвонить</a></div>` : "";
                 let fullScreenBtn = p.vkCode ? `<button onclick="openFullscreen(${index}, 'videoPoints')" class="w-full bg-gray-900 text-white py-3.5 mt-2 rounded-xl text-xs font-black uppercase tracking-widest shadow-lg flex justify-center items-center gap-2 active:bg-gray-700">🎦 На весь экран</button>` : "";
 
-                const html = `
-                    <div class="flex flex-col">
-                        <span class="text-blue-600 text-[10px] font-black uppercase tracking-widest mb-1">Совет инструктора</span>
-                        <h3 class="font-black text-gray-900 text-xl leading-tight mb-3">${p.title}</h3>
-                        ${p.vkCode ? `<div class="video-container shadow-md">${p.vkCode}</div>` : ''}
-                        ${fullScreenBtn}
-                        <p class="text-sm text-gray-700 font-medium leading-snug mt-4">${p.description}</p>
-                        ${author}
-                        ${p.telegramLink ? `<a href="${p.telegramLink}" target="_blank" class="w-full bg-[#2AABEE] text-white py-3 rounded-xl text-xs font-black shadow-lg text-center uppercase tracking-widest mt-3 block">Обсудить в группе</a>` : ''}
-                    </div>`;
-                
-                const cacheId = 'video_' + index;
-                sheetCache[cacheId] = html;
+                const html = `<div class="flex flex-col"><span class="text-blue-600 text-[10px] font-black uppercase tracking-widest mb-1">Совет инструктора</span><h3 class="font-black text-gray-900 text-xl leading-tight mb-3">${p.title}</h3>${p.vkCode ? `<div class="video-container shadow-md">${p.vkCode}</div>` : ''}${fullScreenBtn}<p class="text-sm text-gray-700 font-medium leading-snug mt-4">${p.description}</p>${author}${p.telegramLink ? `<a href="${p.telegramLink}" target="_blank" class="w-full bg-[#2AABEE] text-white py-3 rounded-xl text-xs font-black shadow-lg text-center uppercase tracking-widest mt-3 block">Обсудить в группе</a>` : ''}</div>`;
+                const cacheId = 'video_' + index; sheetCache[cacheId] = html;
 
-                // Используем правильную иконку videoIcon
-                L.marker([p.lat, p.lng], {icon: videoIcon}).addTo(videoMarkersGroup)
-                 .bindTooltip(p.title, { direction: 'top', offset: [0, -10], className: 'custom-tooltip' })
-                 .on('click', () => { map.flyTo([p.lat, p.lng], 17); openSheet(html); });
-
+                L.marker([p.lat, p.lng], {icon: videoIcon}).addTo(videoMarkersGroup).bindTooltip(p.title, { direction: 'top', offset: [0, -10], className: 'custom-tooltip' }).on('click', () => { map.flyTo([p.lat, p.lng], 17); openSheet(html); });
                 menuHTML += `<button onclick="flyToPoint(${p.lat}, ${p.lng}, '${cacheId}')" class="w-full text-left bg-white p-3 rounded-xl border border-gray-100 shadow-sm hover:border-blue-300 hover:shadow-md transition group"><div class="font-bold text-gray-800 text-sm group-hover:text-blue-600">${p.title}</div><div class="text-[10px] text-gray-400 mt-1 truncate">${p.description}</div></button>`;
             });
             menuHTML += `</div>`;
         }
 
-        // 2. УЛИЦЫ
         if (streetPointsData.length > 0) {
             menuHTML += `<h3 class="font-bold text-gray-400 text-[10px] uppercase tracking-widest mb-2 mt-2">📍 Разборы улиц</h3><div class="flex flex-col gap-2 mb-4">`;
-            
             streetPointsData.forEach((p, index) => {
                 let fullScreenBtn = p.vkCode ? `<button onclick="openFullscreen(${index}, 'streetPoints')" class="w-full bg-gray-900 text-white py-3.5 mt-2 rounded-xl text-xs font-black uppercase tracking-widest shadow-lg flex justify-center items-center gap-2 active:bg-gray-700">🎦 На весь экран</button>` : "";
-
-                const html = `
-                    <div class="flex flex-col">
-                        <span class="text-emerald-600 text-[10px] font-black uppercase tracking-widest mb-1">Проезд участка</span>
-                        <h3 class="font-black text-gray-900 text-xl leading-tight mb-3">${p.title}</h3>
-                        ${p.vkCode ? `<div class="video-container shadow-md">${p.vkCode}</div>` : ''}
-                        ${fullScreenBtn}
-                        <p class="text-sm text-gray-700 font-medium leading-snug mt-4">${p.description}</p>
-                    </div>`;
+                const html = `<div class="flex flex-col"><span class="text-emerald-600 text-[10px] font-black uppercase tracking-widest mb-1">Проезд участка</span><h3 class="font-black text-gray-900 text-xl leading-tight mb-3">${p.title}</h3>${p.vkCode ? `<div class="video-container shadow-md">${p.vkCode}</div>` : ''}${fullScreenBtn}<p class="text-sm text-gray-700 font-medium leading-snug mt-4">${p.description}</p></div>`;
                 
-                const cacheId = 'street_' + index;
-                sheetCache[cacheId] = html;
-
-                // Используем правильную иконку streetIcon
-                L.marker([p.lat, p.lng], {icon: streetIcon}).addTo(streetPointsGroup)
-                 .bindTooltip(p.title, { direction: 'top', offset: [0, -10], className: 'custom-tooltip' })
-                 .on('click', () => { map.flyTo([p.lat, p.lng], 17); openSheet(html); });
-
+                const cacheId = 'street_' + index; sheetCache[cacheId] = html;
+                L.marker([p.lat, p.lng], {icon: streetIcon}).addTo(streetPointsGroup).bindTooltip(p.title, { direction: 'top', offset: [0, -10], className: 'custom-tooltip' }).on('click', () => { map.flyTo([p.lat, p.lng], 17); openSheet(html); });
                 menuHTML += `<button onclick="flyToPoint(${p.lat}, ${p.lng}, '${cacheId}')" class="w-full text-left bg-white p-3 rounded-xl border border-gray-100 shadow-sm hover:border-emerald-300 hover:shadow-md transition group"><div class="font-bold text-gray-800 text-sm group-hover:text-emerald-600">${p.title}</div><div class="text-[10px] text-gray-400 mt-1 truncate">${p.description}</div></button>`;
             });
             menuHTML += `</div>`;
         }
 
-        // 3. ИНФОРМАЦИЯ
-        if (infoPointsData.length > 0) {
-            menuHTML += `<h3 class="font-bold text-gray-400 text-[10px] uppercase tracking-widest mb-2 mt-2">❗️ Справка и документы</h3><div class="flex flex-col gap-2 mb-4">`;
+        // ОТРИСОВКА ЗНАКОВ
+        if (signsData.length > 0) {
+            menuHTML += `<h3 class="font-bold text-gray-400 text-[10px] uppercase tracking-widest mb-2 mt-2">🚦 Дорожные знаки</h3><div class="flex flex-col gap-2 mb-4">`;
             
-            infoPointsData.forEach((p, index) => {
-                let mediaHtml = '';
-                if (p.imageUrl) {
-                    mediaHtml += `<img src="${p.imageUrl}" alt="Инфо" class="w-full h-auto mt-2 rounded-lg shadow-sm border border-gray-100 object-cover">`;
-                }
-
-                let linksHtml = '';
-                if (p.fileUrl) {
-                    linksHtml += `<a href="${p.fileUrl}" target="_blank" class="w-full bg-indigo-50 text-indigo-700 text-center py-2.5 rounded-lg text-xs font-bold uppercase shadow-sm mt-2 block border border-indigo-200 hover:bg-indigo-100 transition">📄 Открыть документ</a>`;
-                }
-                if (p.phone) {
-                    linksHtml += `<a href="tel:${p.phone}" class="w-full bg-emerald-50 text-emerald-700 text-center py-2.5 rounded-lg text-xs font-bold uppercase shadow-sm mt-2 block border border-emerald-200 hover:bg-emerald-100 transition">📞 Позвонить</a>`;
-                }
-
+            signsData.forEach((p, index) => {
                 const html = `
                     <div class="flex flex-col">
-                        <span class="text-purple-600 text-[10px] font-black uppercase tracking-widest mb-1">Справка</span>
+                        <span class="text-red-600 text-[10px] font-black uppercase tracking-widest mb-1">Внимание на знак</span>
                         <h3 class="font-black text-gray-900 text-xl leading-tight mb-2">${p.title}</h3>
-                        ${mediaHtml}
-                        <p class="text-sm text-gray-700 font-medium leading-snug mt-3">${p.description}</p>
-                        ${linksHtml}
+                        <p class="text-sm text-gray-700 font-medium leading-snug mt-2">${p.description}</p>
                     </div>`;
                 
-                const cacheId = 'info_' + index;
+                const cacheId = 'sign_' + index;
                 sheetCache[cacheId] = html;
 
-                // Используем правильную иконку infoIcon
-                L.marker([p.lat, p.lng], {icon: infoIcon}).addTo(infoPointsGroup)
+                L.marker([p.lat, p.lng], {icon: getSignIcon(p.type)}).addTo(signsGroup)
                  .bindTooltip(p.title, { direction: 'top', offset: [0, -10], className: 'custom-tooltip' })
                  .on('click', () => { map.flyTo([p.lat, p.lng], 17); openSheet(html); });
 
-                menuHTML += `<button onclick="flyToPoint(${p.lat}, ${p.lng}, '${cacheId}')" class="w-full text-left bg-white p-3 rounded-xl border border-gray-100 shadow-sm hover:border-purple-300 hover:shadow-md transition group"><div class="font-bold text-gray-800 text-sm group-hover:text-purple-600">${p.title}</div><div class="text-[10px] text-gray-400 mt-1 truncate">${p.description}</div></button>`;
+                menuHTML += `<button onclick="flyToPoint(${p.lat}, ${p.lng}, '${cacheId}')" class="w-full text-left bg-white p-3 rounded-xl border border-gray-100 shadow-sm hover:border-red-300 hover:shadow-md transition group"><div class="font-bold text-gray-800 text-sm group-hover:text-red-600">${p.title}</div><div class="text-[10px] text-gray-400 mt-1 truncate">${p.description}</div></button>`;
             });
             menuHTML += `</div>`;
         }
 
-        // 4. МАРШРУТЫ
+        if (infoPointsData.length > 0) {
+            infoPointsData.forEach((p, index) => {
+                let mediaHtml = p.imageUrl ? `<img src="${p.imageUrl}" alt="Инфо" class="w-full h-auto mt-2 rounded-lg shadow-sm border border-gray-100 object-cover">` : '';
+                let linksHtml = p.fileUrl ? `<a href="${p.fileUrl}" target="_blank" class="w-full bg-indigo-50 text-indigo-700 text-center py-2.5 rounded-lg text-xs font-bold uppercase shadow-sm mt-2 block border border-indigo-200 hover:bg-indigo-100 transition">📄 Открыть документ</a>` : '';
+                if (p.phone) linksHtml += `<a href="tel:${p.phone}" class="w-full bg-emerald-50 text-emerald-700 text-center py-2.5 rounded-lg text-xs font-bold uppercase shadow-sm mt-2 block border border-emerald-200 hover:bg-emerald-100 transition">📞 Позвонить</a>`;
+
+                const html = `<div class="flex flex-col"><span class="text-purple-600 text-[10px] font-black uppercase tracking-widest mb-1">Справка</span><h3 class="font-black text-gray-900 text-xl leading-tight mb-2">${p.title}</h3>${mediaHtml}<p class="text-sm text-gray-700 font-medium leading-snug mt-3">${p.description}</p>${linksHtml}</div>`;
+                const cacheId = 'info_' + index; sheetCache[cacheId] = html;
+
+                L.marker([p.lat, p.lng], {icon: infoIcon}).addTo(infoPointsGroup).bindTooltip(p.title, { direction: 'top', offset: [0, -10], className: 'custom-tooltip' }).on('click', () => { map.flyTo([p.lat, p.lng], 17); openSheet(html); });
+            });
+        }
+
         if (routeLinesData.length > 0) {
-            menuHTML += `<h3 class="font-bold text-gray-400 text-[10px] uppercase tracking-widest mb-2 mt-2">🛣️ Маршруты</h3><div class="flex flex-col gap-2 mb-4">`;
-            
             routeLinesData.forEach((r, index) => {
                 const line = L.polyline(r.coordinates, { color: '#10B981', weight: 8 }).addTo(routeLinesGroup);
                 let fullScreenBtn = r.vkCode ? `<button onclick="openFullscreen(${index}, 'routeLines')" class="w-full bg-gray-900 text-white py-3.5 mt-2 rounded-xl text-xs font-black uppercase tracking-widest shadow-lg flex justify-center items-center gap-2 active:bg-gray-700">🎦 На весь экран</button>` : "";
-
-                const html = `
-                    <div class="flex flex-col">
-                        <span class="text-emerald-600 text-[10px] font-black uppercase tracking-widest mb-1">Проезд участка</span>
-                        <h3 class="font-black text-gray-900 text-xl leading-tight mb-3">${r.title}</h3>
-                        ${r.vkCode ? `<div class="video-container shadow-md">${r.vkCode}</div>` : ''}
-                        ${fullScreenBtn}
-                        <p class="text-sm text-gray-700 font-medium leading-snug mt-4">${r.description}</p>
-                    </div>`;
-                
-                const cacheId = 'route_' + index;
-                sheetCache[cacheId] = html;
+                const html = `<div class="flex flex-col"><span class="text-emerald-600 text-[10px] font-black uppercase tracking-widest mb-1">Проезд участка</span><h3 class="font-black text-gray-900 text-xl leading-tight mb-3">${r.title}</h3>${r.vkCode ? `<div class="video-container shadow-md">${r.vkCode}</div>` : ''}${fullScreenBtn}<p class="text-sm text-gray-700 font-medium leading-snug mt-4">${r.description}</p></div>`;
+                const cacheId = 'route_' + index; sheetCache[cacheId] = html;
 
                 line.bindTooltip(r.title, { sticky: true, className: 'custom-tooltip' });
                 line.on('click', (e) => { map.flyTo(e.latlng, 17); openSheet(html); });
-
-                const startLat = r.coordinates[0][0];
-                const startLng = r.coordinates[0][1];
-
-                menuHTML += `<button onclick="flyToPoint(${startLat}, ${startLng}, '${cacheId}')" class="w-full text-left bg-white p-3 rounded-xl border border-gray-100 shadow-sm hover:border-emerald-300 hover:shadow-md transition group"><div class="font-bold text-gray-800 text-sm group-hover:text-emerald-600">${r.title}</div><div class="text-[10px] text-gray-400 mt-1 truncate">${r.description}</div></button>`;
             });
-            menuHTML += `</div>`;
         }
 
-        // 5. ИНСТРУКТОРЫ
         instructorsData.forEach((i, index) => {
-            const html = `
-                <div class="flex flex-col">
-                    <div class="flex gap-4 items-center mb-4">
-                        <img src="${i.photoUrl}" class="w-16 h-16 rounded-full border-2 border-orange-500 shadow-md object-cover">
-                        <div>
-                            <h3 class="font-black text-gray-900 text-xl leading-tight">${i.name}</h3>
-                            <p class="text-gray-500 text-xs font-medium mt-0.5">${i.car}</p>
-                            <div class="text-yellow-400 text-xs mt-1 font-black uppercase">⭐⭐⭐⭐⭐ ${i.rating}</div>
-                        </div>
-                    </div>
-                    <p class="text-sm text-gray-700 italic bg-gray-50 p-3 rounded-lg border border-gray-100 mb-4">"${i.description}"</p>
-                    <div class="flex gap-2">
-                        <a href="tel:${i.phone}" class="flex-1 bg-emerald-500 text-white text-center py-3 rounded-xl text-xs font-black uppercase tracking-widest shadow-md">📞 Звонок</a>
-                        <a href="${i.telegramLink}" target="_blank" class="flex-1 bg-[#2AABEE] text-white text-center py-3 rounded-xl text-xs font-black uppercase tracking-widest shadow-md">💬 Написать</a>
-                    </div>
-                    <div class="mt-4 pt-3 border-t border-gray-200 flex justify-between items-center">
-                        <span class="text-xs text-gray-500 font-bold uppercase">Отзывы (${i.reviewsCount})</span>
-                        <a href="${i.reviewsLink || '#'}" target="_blank" class="text-xs font-black text-blue-600 uppercase">Читать 📝</a>
-                    </div>
-                </div>`;
-            
-            L.marker([i.lat, i.lng], {icon: instructorIcon}).addTo(instructorsGroup)
-             .bindTooltip(i.name, { direction: 'top', offset: [0, -10], className: 'custom-tooltip' })
-             .on('click', () => { map.flyTo([i.lat, i.lng], 17); openSheet(html); });
+            const html = `<div class="flex flex-col"><div class="flex gap-4 items-center mb-4"><img src="${i.photoUrl}" class="w-16 h-16 rounded-full border-2 border-orange-500 shadow-md object-cover"><div><h3 class="font-black text-gray-900 text-xl leading-tight">${i.name}</h3><p class="text-gray-500 text-xs font-medium mt-0.5">${i.car}</p><div class="text-yellow-400 text-xs mt-1 font-black uppercase">⭐⭐⭐⭐⭐ ${i.rating}</div></div></div><p class="text-sm text-gray-700 italic bg-gray-50 p-3 rounded-lg border border-gray-100 mb-4">"${i.description}"</p><div class="flex gap-2"><a href="tel:${i.phone}" class="flex-1 bg-emerald-500 text-white text-center py-3 rounded-xl text-xs font-black uppercase tracking-widest shadow-md">📞 Звонок</a><a href="${i.telegramLink}" target="_blank" class="flex-1 bg-[#2AABEE] text-white text-center py-3 rounded-xl text-xs font-black uppercase tracking-widest shadow-md">💬 Написать</a></div></div>`;
+            L.marker([i.lat, i.lng], {icon: instructorIcon}).addTo(instructorsGroup).bindTooltip(i.name, { direction: 'top', offset: [0, -10], className: 'custom-tooltip' }).on('click', () => { map.flyTo([i.lat, i.lng], 17); openSheet(html); });
         });
 
         document.getElementById('menuContent').innerHTML = menuHTML;
