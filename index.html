@@ -140,14 +140,18 @@
                 title: "Документы для экзамена",
                 description: "Для допуска к экзамену в ГИБДД при себе необходимо иметь паспорт и квитанцию об оплате госпошлины.",
                 imageUrl: "", fileUrl: "", phone: "+7 (4852) 11-22-33" 
-            },{
-    lat: 57.58876, lng: 39.85076,
-    title: "Разворот в ограниченном пространстве",
-    description: "Улица на которой могут давать задание « разворот в ограниченном пространстве с применением заднего хода ». Помните, что разворот запрещен в местах с видимостью дороги хотя б в одном направлении менее 100 метров. Исключение, если инспектор сам, из-за дорожной обстановки или по другим причинам указывает место для выполнения задания.",
-    imageUrl: "",
-    fileUrl: "",
-    phone: ""
-},
+            }
+        ];
+
+        const tasksData = [
+            // =========================================================================
+            // 👇👇👇 СЮДА ВСТАВЛЯТЬ КОД: 🎯 ЗАДАНИЯ (Упражнения, маневры) 👇👇👇
+            // =========================================================================
+            {
+                lat: 57.58876, lng: 39.85076,
+                title: "Разворот в ограниченном пространстве",
+                description: "Улица на которой могут давать задание «разворот в ограниченном пространстве с применением заднего хода». Помните, что разворот запрещен в местах с видимостью дороги хотя б в одном направлении менее 100 метров. Исключение, если инспектор сам, из-за дорожной обстановки или по другим причинам указывает место для выполнения задания."
+            }
         ];
 
         const signsData = [
@@ -250,13 +254,14 @@
         const videoMarkersGroup = L.layerGroup().addTo(map);
         const streetPointsGroup = L.layerGroup().addTo(map);
         const infoPointsGroup = L.layerGroup().addTo(map);
-        const signsGroup = L.layerGroup().addTo(map); // Группа для ЗНАКОВ
+        const signsGroup = L.layerGroup().addTo(map); 
+        const tasksGroup = L.layerGroup().addTo(map); // Группа для ЗАДАНИЙ
         const routeLinesGroup = L.layerGroup().addTo(map);
         const instructorsGroup = L.layerGroup().addTo(map);
 
         L.control.layers(
             { "🗺️ Улицы": streetLayer, "🛰️ Спутник": satelliteLayer }, 
-            { "🎬 Видео": videoMarkersGroup, "📍 Разборы улиц": streetPointsGroup, "🚦 Знаки": signsGroup, "❗️ Информация": infoPointsGroup, "🛣️ Маршруты": routeLinesGroup, "👨‍🏫 Инструкторы": instructorsGroup }, 
+            { "🎬 Видео": videoMarkersGroup, "📍 Разборы улиц": streetPointsGroup, "🚦 Знаки": signsGroup, "🎯 Задания": tasksGroup, "❗️ Информация": infoPointsGroup, "🛣️ Маршруты": routeLinesGroup, "👨‍🏫 Инструкторы": instructorsGroup }, 
             { collapsed: true, position: 'topright' } 
         ).addTo(map);
 
@@ -288,10 +293,16 @@
             iconSize: [32, 32], iconAnchor: [16, 16]
         });
 
-        // Функция генерации иконок знаков (Добавлен Уступи дорогу)
+        // Иконка для ЗАДАНИЙ
+        const taskIcon = L.divIcon({
+            className: 'brand-icon',
+            html: `<div class="w-8 h-8 bg-pink-600 rounded-full border-2 border-white shadow-md flex items-center justify-center text-white text-sm">🎯</div>`,
+            iconSize: [32, 32], iconAnchor: [16, 16]
+        });
+
         function getSignIcon(type) {
             let htmlContent = '';
-            let iSize = [28, 28]; // Базовый размер знака
+            let iSize = [28, 28]; 
             let iAnchor = [14, 14];
 
             const noStopHtml = `<div class="w-7 h-7 bg-blue-700 rounded-full border-[3px] border-red-600 shadow-md relative flex items-center justify-center overflow-hidden z-10"><div class="absolute w-8 h-[3px] bg-red-600 rotate-45"></div><div class="absolute w-8 h-[3px] bg-red-600 -rotate-45"></div></div>`;
@@ -305,7 +316,6 @@
             } else if (type === 'no_stop') {
                 htmlContent = noStopHtml;
             } else if (type === 'stop') {
-                // Векторный знак STOP
                 htmlContent = `
                     <div class="flex items-center justify-center w-7 h-7 drop-shadow-md">
                         <svg viewBox="0 0 100 100" class="w-full h-full">
@@ -314,22 +324,15 @@
                         </svg>
                     </div>`;
             } else if (type === 'yield') {
-                // Векторный знак УСТУПИ ДОРОГУ (Перевернутый треугольник)
                 htmlContent = `
                     <div class="flex items-center justify-center w-7 h-7 drop-shadow-md">
                         <svg viewBox="0 0 100 100" class="w-full h-full">
-                            <!-- Треугольник с закругленными углами -->
                             <polygon points="5,10 95,10 50,90" fill="white" stroke="#dc2626" stroke-width="14" stroke-linejoin="round"/>
                         </svg>
                     </div>`;
             }
 
-            return L.divIcon({
-                className: 'sign-icon',
-                html: htmlContent,
-                iconSize: iSize,
-                iconAnchor: iAnchor
-            });
+            return L.divIcon({ className: 'sign-icon', html: htmlContent, iconSize: iSize, iconAnchor: iAnchor });
         }
 
         // --- ГЕНЕРАЦИЯ КАРТОЧЕК И СПИСКА ---
@@ -359,6 +362,20 @@
                 const cacheId = 'street_' + index; sheetCache[cacheId] = html;
                 L.marker([p.lat, p.lng], {icon: streetIcon}).addTo(streetPointsGroup).bindTooltip(p.title, { direction: 'top', offset: [0, -10], className: 'custom-tooltip' }).on('click', () => { map.flyTo([p.lat, p.lng], 17); openSheet(html); });
                 menuHTML += `<button onclick="flyToPoint(${p.lat}, ${p.lng}, '${cacheId}')" class="w-full text-left bg-white p-3 rounded-xl border border-gray-100 shadow-sm hover:border-emerald-300 hover:shadow-md transition group"><div class="font-bold text-gray-800 text-sm group-hover:text-emerald-600">${p.title}</div><div class="text-[10px] text-gray-400 mt-1 truncate">${p.description}</div></button>`;
+            });
+            menuHTML += `</div>`;
+        }
+
+        // ОТРИСОВКА ЗАДАНИЙ
+        if (tasksData && tasksData.length > 0) {
+            menuHTML += `<h3 class="font-bold text-gray-400 text-[10px] uppercase tracking-widest mb-2 mt-2">🎯 Практические задания</h3><div class="flex flex-col gap-2 mb-4">`;
+            tasksData.forEach((p, index) => {
+                const html = `<div class="flex flex-col"><span class="text-pink-600 text-[10px] font-black uppercase tracking-widest mb-1">Экзаменационное задание</span><h3 class="font-black text-gray-900 text-xl leading-tight mb-3">${p.title}</h3><p class="text-sm text-gray-700 font-medium leading-snug mt-2">${p.description}</p></div>`;
+                const cacheId = 'task_' + index; sheetCache[cacheId] = html;
+
+                L.marker([p.lat, p.lng], {icon: taskIcon}).addTo(tasksGroup).bindTooltip(p.title, { direction: 'top', offset: [0, -10], className: 'custom-tooltip' }).on('click', () => { map.flyTo([p.lat, p.lng], 17); openSheet(html); });
+                
+                menuHTML += `<button onclick="flyToPoint(${p.lat}, ${p.lng}, '${cacheId}')" class="w-full text-left bg-white p-3 rounded-xl border border-gray-100 shadow-sm hover:border-pink-300 hover:shadow-md transition group"><div class="font-bold text-gray-800 text-sm group-hover:text-pink-600">${p.title}</div><div class="text-[10px] text-gray-400 mt-1 truncate">${p.description}</div></button>`;
             });
             menuHTML += `</div>`;
         }
@@ -402,7 +419,6 @@
 
         if (routeLinesData.length > 0) {
             routeLinesData.forEach((r, index) => {
-                // ВАЖНО: Добавлено чтение цвета (r.color)
                 const line = L.polyline(r.coordinates, { color: r.color || '#10B981', weight: 8 }).addTo(routeLinesGroup);
                 
                 let fullScreenBtn = r.vkCode ? `<button onclick="openFullscreen(${index}, 'routeLines')" class="w-full bg-gray-900 text-white py-3.5 mt-2 rounded-xl text-xs font-black uppercase tracking-widest shadow-lg flex justify-center items-center gap-2 active:bg-gray-700">🎦 На весь экран</button>` : "";
