@@ -48,9 +48,17 @@
         </div>
     </div>
 
+    <!-- Кнопка "Список" -->
     <div class="absolute top-[80px] left-3 z-[1000] pointer-events-auto">
         <button onclick="openMenu()" class="bg-white/95 backdrop-blur-md text-gray-800 px-4 py-2 rounded-xl shadow-[0_4px_10px_rgba(0,0,0,0.15)] font-bold text-xs uppercase tracking-wider flex items-center gap-2 border border-gray-100 hover:bg-gray-50 transition">
             📋 Список
+        </button>
+    </div>
+
+    <!-- НОВАЯ КНОПКА "РУЛЕТКА" -->
+    <div class="absolute top-[130px] left-3 z-[1000] pointer-events-auto">
+        <button id="measureBtn" onclick="toggleMeasure()" class="bg-white/95 backdrop-blur-md text-gray-800 px-4 py-2 rounded-xl shadow-[0_4px_10px_rgba(0,0,0,0.15)] font-bold text-xs uppercase tracking-wider flex items-center gap-2 border border-gray-100 hover:bg-gray-50 transition w-full justify-center">
+            📏 Рулетка
         </button>
     </div>
 
@@ -91,9 +99,6 @@
         // =========================================================================
         
         const videoPointsData = [
-            // =========================================================================
-            // 👇👇👇 СЮДА ВСТАВЛЯТЬ КОД: 🎬 РАЗБОРЫ ПЕРЕКРЕСТКОВ (ВИДЕО) 👇👇👇
-            // =========================================================================
             {
                 lat: 57.5871, lng: 39.8515,
                 title: "Разбор перекрестка у Арены",
@@ -114,9 +119,6 @@
         ];
 
         const streetPointsData = [
-            // =========================================================================
-            // 👇👇👇 СЮДА ВСТАВЛЯТЬ КОД: 📍 РАЗБОРЫ УЛИЦ 👇👇👇
-            // =========================================================================
             { lat: 57.59012, lng: 39.85937, title: "улица Гагарина", description: "ул. Гагарина от Московского проспекта до ул. Нефтяников", telegramLink: "", authorName: "", authorPhone: "", authorPrice: "0", vkCode: `<iframe src="https://vkvideo.ru/video_ext.php?oid=-236190441&id=456239018&hash=0783681156dd1f26&hd=3" allow="autoplay; encrypted-media; fullscreen; picture-in-picture;" allowfullscreen></iframe>` },
             { lat: 57.58481, lng: 39.83561, title: "улица Менделеева", description: "от ул. Титова до ул. Курчатова", telegramLink: "", authorName: "", authorPhone: "", authorPrice: "0", vkCode: `<iframe src="https://vkvideo.ru/video_ext.php?oid=-236190441&id=456239021&hash=2c0ea19bd41c438f&hd=3" width="1280" height="720" allow="autoplay; encrypted-media; fullscreen; picture-in-picture; screen-wake-lock;" frameborder="0" allowfullscreen></iframe>` },
             { lat: 57.58150, lng: 39.85189, title: "улица Павлова", description: "ул. Павлова от Московского проспекта и обратно", telegramLink: "", authorName: "", authorPhone: "", authorPrice: "0", vkCode: `<iframe src="https://vkvideo.ru/video_ext.php?oid=-236190441&id=456239020&hash=139d4be0f98d6870&hd=3" width="1280" height="720" allow="autoplay; encrypted-media; fullscreen; picture-in-picture; screen-wake-lock;" frameborder="0" allowfullscreen></iframe>` },
@@ -132,9 +134,6 @@
         ];
 
         const infoPointsData = [
-            // =========================================================================
-            // 👇👇👇 СЮДА ВСТАВЛЯТЬ КОД: ❗️ ИНФОРМАЦИЯ (Справки, Документы) 👇👇👇
-            // =========================================================================
             {
                 lat: 57.5880, lng: 39.8520, 
                 title: "Документы для экзамена",
@@ -143,21 +142,30 @@
             }
         ];
 
+        // МАССИВ 1: ТОЛЬКО ЗАДАНИЯ (Маневры)
         const tasksData = [
-            // =========================================================================
-            // 👇👇👇 СЮДА ВСТАВЛЯТЬ КОД: 🎯 ЗАДАНИЯ (Упражнения, маневры) 👇👇👇
-            // =========================================================================
             {
                 lat: 57.58876, lng: 39.85076,
                 title: "Разворот в ограниченном пространстве",
                 description: "Улица на которой могут давать задание «разворот в ограниченном пространстве с применением заднего хода». Помните, что разворот запрещен в местах с видимостью дороги хотя б в одном направлении менее 100 метров. Исключение, если инспектор сам, из-за дорожной обстановки или по другим причинам указывает место для выполнения задания."
+            },{
+    lat: 57.58958, lng: 39.84385,
+    title: "Разворот в ограниченном пространстве",
+    description: "Улица на которой могут давать задание «разворот в ограниченном пространстве с применением заднего хода». Помните, что разворот запрещен в местах с видимостью дороги хотя б в одном направлении менее 100 метров. Исключение, если инспектор сам, из-за дорожной обстановки или по другим причинам указывает место для выполнения задания."
+},
+        ];
+
+        // МАССИВ 2: НОВЫЙ! ТОЛЬКО ОПРОСЫ
+        const pollsData = [
+            {
+                lat: 57.58650, lng: 39.85300,
+                title: "Ситуация: Как вы здесь поворачиваете?",
+                description: "Опрос для учеников: как вы ведете себя на этом участке? Какую полосу занимаете и какой поворотник включаете? Переходи в Telegram и голосуй!",
+                telegramLink: "https://t.me/bez_dtp"
             }
         ];
 
         const signsData = [
-            // =========================================================================
-            // 👇👇👇 СЮДА ВСТАВЛЯТЬ КОД: 🚦 ДОРОЖНЫЕ ЗНАКИ 👇👇👇
-            // =========================================================================
             { lat: 57.5891, lng: 39.8485, type: 'no_stop', title: "Остановка запрещена", description: "На этом участке парковаться нельзя, сразу несдача!" },
             { lat: 57.5880, lng: 39.8500, type: 'speed40', title: "Ограничение 40 км/ч", description: "Зона действия знака до следующего перекрестка." },
             { lat: 57.5875, lng: 39.8517, type: 'speed20', title: "Ограничение 20 км/ч", description: "Внимание, пешеходный переход рядом." },
@@ -167,9 +175,6 @@
         ];
 
         const routeLinesData = [
-            // =========================================================================
-            // 👇👇👇 СЮДА ВСТАВЛЯТЬ КОД: 🛣️ ЛИНИИ МАРШРУТОВ (Зеленые и Красные) 👇👇👇
-            // =========================================================================
             {
                 title: "Улица Гагарина",
                 description: "Проезд всей улицы от светофора до кольца. Обрати внимание на знаки остановки!",
@@ -179,9 +184,6 @@
         ];
 
         const instructorsData = [
-            // =========================================================================
-            // 👇👇👇 СЮДА ВСТАВЛЯТЬ КОД: 👨‍🏫 ИНСТРУКТОРЫ (Коллеги) 👇👇👇
-            // =========================================================================
             {
                 lat: 57.5855, lng: 39.8500,
                 name: "Иван Петров",
@@ -198,6 +200,7 @@
 
         // --- ЛОГИКА ИНТЕРФЕЙСА ---
         function openSheet(htmlContent) {
+            if (isMeasuring) return; 
             document.getElementById('sheetContent').innerHTML = htmlContent;
             document.getElementById('bottomSheet').classList.remove('translate-y-full');
             closeMenu();
@@ -244,94 +247,111 @@
         }
 
         // --- ДВИЖОК КАРТЫ ---
-        const streetLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 19 });
-        const satelliteLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { maxZoom: 19 });
+        const streetLayer = L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', { maxZoom: 22, maxNativeZoom: 19 });
+        const satelliteLayer = L.tileLayer('https://server.arcgisonline.com/ArcGIS/rest/services/World_Imagery/MapServer/tile/{z}/{y}/{x}', { maxZoom: 22, maxNativeZoom: 19 });
 
-        const map = L.map('map', { center: [57.5871, 39.8515], zoom: 16, layers: [streetLayer], zoomControl: false });
+        const map = L.map('map', { center: [57.5871, 39.8515], zoom: 16, maxZoom: 22, layers: [streetLayer], zoomControl: false });
         map.attributionControl.setPrefix(''); 
         L.control.zoom({ position: 'bottomright' }).addTo(map);
 
+        // 8 ГРУПП СЛОЕВ!
         const videoMarkersGroup = L.layerGroup().addTo(map);
         const streetPointsGroup = L.layerGroup().addTo(map);
         const infoPointsGroup = L.layerGroup().addTo(map);
         const signsGroup = L.layerGroup().addTo(map); 
-        const tasksGroup = L.layerGroup().addTo(map); // Группа для ЗАДАНИЙ
+        const tasksGroup = L.layerGroup().addTo(map);
+        const pollsGroup = L.layerGroup().addTo(map); // НОВЫЙ СЛОЙ ОПРОСОВ
         const routeLinesGroup = L.layerGroup().addTo(map);
         const instructorsGroup = L.layerGroup().addTo(map);
 
         L.control.layers(
             { "🗺️ Улицы": streetLayer, "🛰️ Спутник": satelliteLayer }, 
-            { "🎬 Видео": videoMarkersGroup, "📍 Разборы улиц": streetPointsGroup, "🚦 Знаки": signsGroup, "🎯 Задания": tasksGroup, "❗️ Информация": infoPointsGroup, "🛣️ Маршруты": routeLinesGroup, "👨‍🏫 Инструкторы": instructorsGroup }, 
+            { "🎬 Видео": videoMarkersGroup, "📍 Разборы улиц": streetPointsGroup, "🚦 Знаки": signsGroup, "🎯 Задания": tasksGroup, "❓ Опросы": pollsGroup, "❗️ Информация": infoPointsGroup, "🛣️ Маршруты": routeLinesGroup, "👨‍🏫 Инструкторы": instructorsGroup }, 
             { collapsed: true, position: 'topright' } 
         ).addTo(map);
 
+        // --- ИНСТРУМЕНТ "РУЛЕТКА" ---
+        let isMeasuring = false;
+        let measureStart = null;
+        let measureLineGroup = null;
+        let dynamicLine = null;
+        let measureTooltip = null;
+
+        function toggleMeasure() {
+            isMeasuring = !isMeasuring;
+            const btn = document.getElementById('measureBtn');
+            const mapContainer = document.getElementById('map');
+            if (isMeasuring) {
+                btn.classList.add('bg-blue-100', 'text-blue-700', 'border-blue-300');
+                btn.classList.remove('bg-white/95', 'text-gray-800', 'border-gray-100');
+                btn.innerHTML = '🛑 Отменить рулетку';
+                mapContainer.style.cursor = 'crosshair';
+                closeMenu(); closeSheet();
+            } else {
+                btn.classList.remove('bg-blue-100', 'text-blue-700', 'border-blue-300');
+                btn.classList.add('bg-white/95', 'text-gray-800', 'border-gray-100');
+                btn.innerHTML = '📏 Рулетка';
+                mapContainer.style.cursor = '';
+                clearMeasure();
+            }
+        }
+
+        function clearMeasure() {
+            if (measureLineGroup) map.removeLayer(measureLineGroup);
+            if (dynamicLine) map.removeLayer(dynamicLine);
+            if (measureTooltip) map.removeLayer(measureTooltip);
+            measureStart = null; measureLineGroup = null; dynamicLine = null; measureTooltip = null;
+        }
+
+        map.on('click', function(e) {
+            if (!isMeasuring) return;
+            if (!measureStart) {
+                clearMeasure(); measureStart = e.latlng;
+                measureLineGroup = L.featureGroup([L.circleMarker(measureStart, { radius: 5, color: '#ef4444', fillColor: '#fff', fillOpacity: 1, weight: 3 })]).addTo(map);
+                measureTooltip = L.tooltip({ permanent: true, className: 'custom-tooltip', direction: 'top', offset: [0, -10] }).setLatLng(measureStart).setContent('Старт').addTo(map);
+            } else {
+                const dist = map.distance(measureStart, e.latlng);
+                if (dynamicLine) map.removeLayer(dynamicLine);
+                measureLineGroup.addLayer(L.polyline([measureStart, e.latlng], { color: '#ef4444', weight: 4, dashArray: '5, 8' }));
+                measureLineGroup.addLayer(L.circleMarker(e.latlng, { radius: 5, color: '#ef4444', fillColor: '#fff', fillOpacity: 1, weight: 3 }));
+                measureTooltip.setLatLng(e.latlng).setContent(`🏁 ${Math.round(dist)} м.`);
+                measureStart = null; 
+            }
+        });
+
+        map.on('mousemove', function(e) {
+            if (!isMeasuring || !measureStart) return;
+            const dist = map.distance(measureStart, e.latlng);
+            if (!dynamicLine) {
+                dynamicLine = L.polyline([measureStart, e.latlng], { color: '#ef4444', weight: 4, dashArray: '5, 8', opacity: 0.6 }).addTo(map);
+            } else { dynamicLine.setLatLngs([measureStart, e.latlng]); }
+            measureTooltip.setLatLng(e.latlng).setContent(`${Math.round(dist)} м.`);
+        });
+
         // =========================================================
-        // ИКОНКИ (Tailwind CSS Shapes - Высший пилотаж!)
+        // ИКОНКИ
         // =========================================================
 
-        const videoIcon = L.divIcon({
-            className: 'brand-icon',
-            html: `<div class="w-7 h-7 bg-blue-600 rounded-lg border-2 border-white shadow-md flex items-center justify-center text-white text-xs">▶️</div>`,
-            iconSize: [28, 28], iconAnchor: [14, 14]
-        });
-
-        const streetIcon = L.divIcon({
-            className: 'brand-icon',
-            html: `<div class="w-6 h-6 bg-emerald-500 rounded-full border-[1.5px] border-white shadow-sm flex items-center justify-center text-white text-[10px]">📍</div>`,
-            iconSize: [24, 24], iconAnchor: [12, 12]
-        });
-
-        const instructorIcon = L.divIcon({
-            className: 'instructor-icon',
-            html: `<div class="w-8 h-8 bg-orange-500 rounded-full border-2 border-white shadow-md flex items-center justify-center text-sm">👨‍🏫</div>`,
-            iconSize: [32, 32], iconAnchor: [16, 16]
-        });
-
-        const infoIcon = L.divIcon({
-            className: 'brand-icon',
-            html: `<div class="w-8 h-8 bg-purple-600 rounded-full border-2 border-white shadow-md flex items-center justify-center text-white font-bold text-sm">!</div>`,
-            iconSize: [32, 32], iconAnchor: [16, 16]
-        });
-
-        // Иконка для ЗАДАНИЙ
-        const taskIcon = L.divIcon({
-            className: 'brand-icon',
-            html: `<div class="w-8 h-8 bg-pink-600 rounded-full border-2 border-white shadow-md flex items-center justify-center text-white text-sm">🎯</div>`,
-            iconSize: [32, 32], iconAnchor: [16, 16]
-        });
+        const videoIcon = L.divIcon({ className: 'brand-icon', html: `<div class="w-7 h-7 bg-blue-600 rounded-lg border-2 border-white shadow-md flex items-center justify-center text-white text-xs">▶️</div>`, iconSize: [28, 28], iconAnchor: [14, 14] });
+        const streetIcon = L.divIcon({ className: 'brand-icon', html: `<div class="w-6 h-6 bg-emerald-500 rounded-full border-[1.5px] border-white shadow-sm flex items-center justify-center text-white text-[10px]">📍</div>`, iconSize: [24, 24], iconAnchor: [12, 12] });
+        const instructorIcon = L.divIcon({ className: 'instructor-icon', html: `<div class="w-8 h-8 bg-orange-500 rounded-full border-2 border-white shadow-md flex items-center justify-center text-sm">👨‍🏫</div>`, iconSize: [32, 32], iconAnchor: [16, 16] });
+        const infoIcon = L.divIcon({ className: 'brand-icon', html: `<div class="w-8 h-8 bg-purple-600 rounded-full border-2 border-white shadow-md flex items-center justify-center text-white font-bold text-sm">!</div>`, iconSize: [32, 32], iconAnchor: [16, 16] });
+        
+        // Иконка Задания (Розовая)
+        const taskIcon = L.divIcon({ className: 'brand-icon', html: `<div class="w-8 h-8 bg-pink-600 rounded-full border-2 border-white shadow-md flex items-center justify-center text-white text-sm">🎯</div>`, iconSize: [32, 32], iconAnchor: [16, 16] });
+        
+        // НОВАЯ Иконка Опроса (Бирюзовая)
+        const pollIcon = L.divIcon({ className: 'brand-icon', html: `<div class="w-8 h-8 bg-cyan-500 rounded-full border-2 border-white shadow-md flex items-center justify-center text-white text-[10px] font-black">❓</div>`, iconSize: [32, 32], iconAnchor: [16, 16] });
 
         function getSignIcon(type) {
-            let htmlContent = '';
-            let iSize = [28, 28]; 
-            let iAnchor = [14, 14];
-
+            let htmlContent = ''; let iSize = [28, 28]; let iAnchor = [14, 14];
             const noStopHtml = `<div class="w-7 h-7 bg-blue-700 rounded-full border-[3px] border-red-600 shadow-md relative flex items-center justify-center overflow-hidden z-10"><div class="absolute w-8 h-[3px] bg-red-600 rotate-45"></div><div class="absolute w-8 h-[3px] bg-red-600 -rotate-45"></div></div>`;
-
-            if (type === 'speed40') {
-                htmlContent = `<div class="w-7 h-7 bg-white rounded-full border-[3px] border-red-600 shadow-md flex items-center justify-center font-black text-black text-[11px] leading-none tracking-tighter">40</div>`;
-            } else if (type === 'speed20') {
-                htmlContent = `<div class="w-7 h-7 bg-white rounded-full border-[3px] border-red-600 shadow-md flex items-center justify-center font-black text-black text-[11px] leading-none tracking-tighter">20</div>`;
-            } else if (type === 'main_road') {
-                htmlContent = `<div class="w-7 h-7 flex items-center justify-center drop-shadow-md"><div class="w-4 h-4 bg-yellow-400 border-[2px] border-white ring-1 ring-gray-400 transform rotate-45"></div></div>`;
-            } else if (type === 'no_stop') {
-                htmlContent = noStopHtml;
-            } else if (type === 'stop') {
-                htmlContent = `
-                    <div class="flex items-center justify-center w-7 h-7 drop-shadow-md">
-                        <svg viewBox="0 0 100 100" class="w-full h-full">
-                            <polygon points="30,5 70,5 95,30 95,70 70,95 30,95 5,70 5,30" fill="#dc2626" stroke="white" stroke-width="4"/>
-                            <text x="50" y="54" font-family="sans-serif" font-weight="900" font-size="28" fill="white" text-anchor="middle" dominant-baseline="middle" letter-spacing="-1">STOP</text>
-                        </svg>
-                    </div>`;
-            } else if (type === 'yield') {
-                htmlContent = `
-                    <div class="flex items-center justify-center w-7 h-7 drop-shadow-md">
-                        <svg viewBox="0 0 100 100" class="w-full h-full">
-                            <polygon points="5,10 95,10 50,90" fill="white" stroke="#dc2626" stroke-width="14" stroke-linejoin="round"/>
-                        </svg>
-                    </div>`;
-            }
-
+            if (type === 'speed40') { htmlContent = `<div class="w-7 h-7 bg-white rounded-full border-[3px] border-red-600 shadow-md flex items-center justify-center font-black text-black text-[11px] leading-none tracking-tighter">40</div>`; }
+            else if (type === 'speed20') { htmlContent = `<div class="w-7 h-7 bg-white rounded-full border-[3px] border-red-600 shadow-md flex items-center justify-center font-black text-black text-[11px] leading-none tracking-tighter">20</div>`; }
+            else if (type === 'main_road') { htmlContent = `<div class="w-7 h-7 flex items-center justify-center drop-shadow-md"><div class="w-4 h-4 bg-yellow-400 border-[2px] border-white ring-1 ring-gray-400 transform rotate-45"></div></div>`; }
+            else if (type === 'no_stop') { htmlContent = noStopHtml; }
+            else if (type === 'stop') { htmlContent = `<div class="flex items-center justify-center w-7 h-7 drop-shadow-md"><svg viewBox="0 0 100 100" class="w-full h-full"><polygon points="30,5 70,5 95,30 95,70 70,95 30,95 5,70 5,30" fill="#dc2626" stroke="white" stroke-width="4"/><text x="50" y="54" font-family="sans-serif" font-weight="900" font-size="28" fill="white" text-anchor="middle" dominant-baseline="middle" letter-spacing="-1">STOP</text></svg></div>`; }
+            else if (type === 'yield') { htmlContent = `<div class="flex items-center justify-center w-7 h-7 drop-shadow-md"><svg viewBox="0 0 100 100" class="w-full h-full"><polygon points="5,10 95,10 50,90" fill="white" stroke="#dc2626" stroke-width="14" stroke-linejoin="round"/></svg></div>`; }
             return L.divIcon({ className: 'sign-icon', html: htmlContent, iconSize: iSize, iconAnchor: iAnchor });
         }
 
@@ -343,10 +363,8 @@
             videoPointsData.forEach((p, index) => {
                 let author = p.authorName ? `<div class="mt-4 p-3 bg-gray-50 border border-gray-200 rounded-xl"><p class="text-[10px] font-bold text-gray-400 uppercase mb-1">Автор разбора:</p><p class="text-sm font-bold text-gray-800">${p.authorName}</p><p class="text-xs text-blue-600 font-bold mt-0.5">${p.authorPrice}</p><a href="tel:${p.authorPhone}" class="mt-2 block w-full bg-emerald-500 text-white text-center py-2.5 rounded-lg text-xs font-bold uppercase shadow-md tracking-widest">📞 Позвонить</a></div>` : "";
                 let fullScreenBtn = p.vkCode ? `<button onclick="openFullscreen(${index}, 'videoPoints')" class="w-full bg-gray-900 text-white py-3.5 mt-2 rounded-xl text-xs font-black uppercase tracking-widest shadow-lg flex justify-center items-center gap-2 active:bg-gray-700">🎦 На весь экран</button>` : "";
-
                 const html = `<div class="flex flex-col"><span class="text-blue-600 text-[10px] font-black uppercase tracking-widest mb-1">Совет инструктора</span><h3 class="font-black text-gray-900 text-xl leading-tight mb-3">${p.title}</h3>${p.vkCode ? `<div class="video-container shadow-md">${p.vkCode}</div>` : ''}${fullScreenBtn}<p class="text-sm text-gray-700 font-medium leading-snug mt-4">${p.description}</p>${author}${p.telegramLink ? `<a href="${p.telegramLink}" target="_blank" class="w-full bg-[#2AABEE] text-white py-3 rounded-xl text-xs font-black shadow-lg text-center uppercase tracking-widest mt-3 block">Обсудить в группе</a>` : ''}</div>`;
                 const cacheId = 'video_' + index; sheetCache[cacheId] = html;
-
                 L.marker([p.lat, p.lng], {icon: videoIcon}).addTo(videoMarkersGroup).bindTooltip(p.title, { direction: 'top', offset: [0, -10], className: 'custom-tooltip' }).on('click', () => { map.flyTo([p.lat, p.lng], 17); openSheet(html); });
                 menuHTML += `<button onclick="flyToPoint(${p.lat}, ${p.lng}, '${cacheId}')" class="w-full text-left bg-white p-3 rounded-xl border border-gray-100 shadow-sm hover:border-blue-300 hover:shadow-md transition group"><div class="font-bold text-gray-800 text-sm group-hover:text-blue-600">${p.title}</div><div class="text-[10px] text-gray-400 mt-1 truncate">${p.description}</div></button>`;
             });
@@ -358,7 +376,6 @@
             streetPointsData.forEach((p, index) => {
                 let fullScreenBtn = p.vkCode ? `<button onclick="openFullscreen(${index}, 'streetPoints')" class="w-full bg-gray-900 text-white py-3.5 mt-2 rounded-xl text-xs font-black uppercase tracking-widest shadow-lg flex justify-center items-center gap-2 active:bg-gray-700">🎦 На весь экран</button>` : "";
                 const html = `<div class="flex flex-col"><span class="text-emerald-600 text-[10px] font-black uppercase tracking-widest mb-1">Проезд участка</span><h3 class="font-black text-gray-900 text-xl leading-tight mb-3">${p.title}</h3>${p.vkCode ? `<div class="video-container shadow-md">${p.vkCode}</div>` : ''}${fullScreenBtn}<p class="text-sm text-gray-700 font-medium leading-snug mt-4">${p.description}</p></div>`;
-                
                 const cacheId = 'street_' + index; sheetCache[cacheId] = html;
                 L.marker([p.lat, p.lng], {icon: streetIcon}).addTo(streetPointsGroup).bindTooltip(p.title, { direction: 'top', offset: [0, -10], className: 'custom-tooltip' }).on('click', () => { map.flyTo([p.lat, p.lng], 17); openSheet(html); });
                 menuHTML += `<button onclick="flyToPoint(${p.lat}, ${p.lng}, '${cacheId}')" class="w-full text-left bg-white p-3 rounded-xl border border-gray-100 shadow-sm hover:border-emerald-300 hover:shadow-md transition group"><div class="font-bold text-gray-800 text-sm group-hover:text-emerald-600">${p.title}</div><div class="text-[10px] text-gray-400 mt-1 truncate">${p.description}</div></button>`;
@@ -366,39 +383,37 @@
             menuHTML += `</div>`;
         }
 
-        // ОТРИСОВКА ЗАДАНИЙ
+        // ЗАДАНИЯ (Теперь без кнопок Telegram)
         if (tasksData && tasksData.length > 0) {
             menuHTML += `<h3 class="font-bold text-gray-400 text-[10px] uppercase tracking-widest mb-2 mt-2">🎯 Практические задания</h3><div class="flex flex-col gap-2 mb-4">`;
             tasksData.forEach((p, index) => {
                 const html = `<div class="flex flex-col"><span class="text-pink-600 text-[10px] font-black uppercase tracking-widest mb-1">Экзаменационное задание</span><h3 class="font-black text-gray-900 text-xl leading-tight mb-3">${p.title}</h3><p class="text-sm text-gray-700 font-medium leading-snug mt-2">${p.description}</p></div>`;
                 const cacheId = 'task_' + index; sheetCache[cacheId] = html;
-
                 L.marker([p.lat, p.lng], {icon: taskIcon}).addTo(tasksGroup).bindTooltip(p.title, { direction: 'top', offset: [0, -10], className: 'custom-tooltip' }).on('click', () => { map.flyTo([p.lat, p.lng], 17); openSheet(html); });
-                
                 menuHTML += `<button onclick="flyToPoint(${p.lat}, ${p.lng}, '${cacheId}')" class="w-full text-left bg-white p-3 rounded-xl border border-gray-100 shadow-sm hover:border-pink-300 hover:shadow-md transition group"><div class="font-bold text-gray-800 text-sm group-hover:text-pink-600">${p.title}</div><div class="text-[10px] text-gray-400 mt-1 truncate">${p.description}</div></button>`;
             });
             menuHTML += `</div>`;
         }
 
-        // ОТРИСОВКА ЗНАКОВ
+        // ОПРОСЫ (Новый крутой слой)
+        if (pollsData && pollsData.length > 0) {
+            menuHTML += `<h3 class="font-bold text-gray-400 text-[10px] uppercase tracking-widest mb-2 mt-2">❓ Интерактивные опросы</h3><div class="flex flex-col gap-2 mb-4">`;
+            pollsData.forEach((p, index) => {
+                let tgBtn = p.telegramLink ? `<a href="${p.telegramLink}" target="_blank" class="w-full bg-[#2AABEE] text-white py-3 rounded-xl text-xs font-black shadow-lg text-center uppercase tracking-widest mt-4 block transition hover:bg-[#229ED9]">Перейти к голосованию</a>` : '';
+                const html = `<div class="flex flex-col"><span class="text-cyan-600 text-[10px] font-black uppercase tracking-widest mb-1">Проверь себя</span><h3 class="font-black text-gray-900 text-xl leading-tight mb-3">${p.title}</h3><p class="text-sm text-gray-700 font-medium leading-snug mt-2">${p.description}</p>${tgBtn}</div>`;
+                const cacheId = 'poll_' + index; sheetCache[cacheId] = html;
+                L.marker([p.lat, p.lng], {icon: pollIcon}).addTo(pollsGroup).bindTooltip(p.title, { direction: 'top', offset: [0, -10], className: 'custom-tooltip' }).on('click', () => { map.flyTo([p.lat, p.lng], 17); openSheet(html); });
+                menuHTML += `<button onclick="flyToPoint(${p.lat}, ${p.lng}, '${cacheId}')" class="w-full text-left bg-white p-3 rounded-xl border border-gray-100 shadow-sm hover:border-cyan-300 hover:shadow-md transition group"><div class="font-bold text-gray-800 text-sm group-hover:text-cyan-600">${p.title}</div><div class="text-[10px] text-gray-400 mt-1 truncate">${p.description}</div></button>`;
+            });
+            menuHTML += `</div>`;
+        }
+
         if (signsData.length > 0) {
             menuHTML += `<h3 class="font-bold text-gray-400 text-[10px] uppercase tracking-widest mb-2 mt-2">🚦 Дорожные знаки</h3><div class="flex flex-col gap-2 mb-4">`;
-            
             signsData.forEach((p, index) => {
-                const html = `
-                    <div class="flex flex-col">
-                        <span class="text-red-600 text-[10px] font-black uppercase tracking-widest mb-1">Внимание на знак</span>
-                        <h3 class="font-black text-gray-900 text-xl leading-tight mb-2">${p.title}</h3>
-                        <p class="text-sm text-gray-700 font-medium leading-snug mt-2">${p.description}</p>
-                    </div>`;
-                
-                const cacheId = 'sign_' + index;
-                sheetCache[cacheId] = html;
-
-                L.marker([p.lat, p.lng], {icon: getSignIcon(p.type)}).addTo(signsGroup)
-                 .bindTooltip(p.title, { direction: 'top', offset: [0, -10], className: 'custom-tooltip' })
-                 .on('click', () => { map.flyTo([p.lat, p.lng], 17); openSheet(html); });
-
+                const html = `<div class="flex flex-col"><span class="text-red-600 text-[10px] font-black uppercase tracking-widest mb-1">Внимание на знак</span><h3 class="font-black text-gray-900 text-xl leading-tight mb-2">${p.title}</h3><p class="text-sm text-gray-700 font-medium leading-snug mt-2">${p.description}</p></div>`;
+                const cacheId = 'sign_' + index; sheetCache[cacheId] = html;
+                L.marker([p.lat, p.lng], {icon: getSignIcon(p.type)}).addTo(signsGroup).bindTooltip(p.title, { direction: 'top', offset: [0, -10], className: 'custom-tooltip' }).on('click', () => { map.flyTo([p.lat, p.lng], 17); openSheet(html); });
                 menuHTML += `<button onclick="flyToPoint(${p.lat}, ${p.lng}, '${cacheId}')" class="w-full text-left bg-white p-3 rounded-xl border border-gray-100 shadow-sm hover:border-red-300 hover:shadow-md transition group"><div class="font-bold text-gray-800 text-sm group-hover:text-red-600">${p.title}</div><div class="text-[10px] text-gray-400 mt-1 truncate">${p.description}</div></button>`;
             });
             menuHTML += `</div>`;
@@ -409,10 +424,8 @@
                 let mediaHtml = p.imageUrl ? `<img src="${p.imageUrl}" alt="Инфо" class="w-full h-auto mt-2 rounded-lg shadow-sm border border-gray-100 object-cover">` : '';
                 let linksHtml = p.fileUrl ? `<a href="${p.fileUrl}" target="_blank" class="w-full bg-indigo-50 text-indigo-700 text-center py-2.5 rounded-lg text-xs font-bold uppercase shadow-sm mt-2 block border border-indigo-200 hover:bg-indigo-100 transition">📄 Открыть документ</a>` : '';
                 if (p.phone) linksHtml += `<a href="tel:${p.phone}" class="w-full bg-emerald-50 text-emerald-700 text-center py-2.5 rounded-lg text-xs font-bold uppercase shadow-sm mt-2 block border border-emerald-200 hover:bg-emerald-100 transition">📞 Позвонить</a>`;
-
                 const html = `<div class="flex flex-col"><span class="text-purple-600 text-[10px] font-black uppercase tracking-widest mb-1">Справка</span><h3 class="font-black text-gray-900 text-xl leading-tight mb-2">${p.title}</h3>${mediaHtml}<p class="text-sm text-gray-700 font-medium leading-snug mt-3">${p.description}</p>${linksHtml}</div>`;
                 const cacheId = 'info_' + index; sheetCache[cacheId] = html;
-
                 L.marker([p.lat, p.lng], {icon: infoIcon}).addTo(infoPointsGroup).bindTooltip(p.title, { direction: 'top', offset: [0, -10], className: 'custom-tooltip' }).on('click', () => { map.flyTo([p.lat, p.lng], 17); openSheet(html); });
             });
         }
@@ -420,11 +433,9 @@
         if (routeLinesData.length > 0) {
             routeLinesData.forEach((r, index) => {
                 const line = L.polyline(r.coordinates, { color: r.color || '#10B981', weight: 8 }).addTo(routeLinesGroup);
-                
                 let fullScreenBtn = r.vkCode ? `<button onclick="openFullscreen(${index}, 'routeLines')" class="w-full bg-gray-900 text-white py-3.5 mt-2 rounded-xl text-xs font-black uppercase tracking-widest shadow-lg flex justify-center items-center gap-2 active:bg-gray-700">🎦 На весь экран</button>` : "";
                 const html = `<div class="flex flex-col"><span class="text-emerald-600 text-[10px] font-black uppercase tracking-widest mb-1">Проезд участка</span><h3 class="font-black text-gray-900 text-xl leading-tight mb-3">${r.title}</h3>${r.vkCode ? `<div class="video-container shadow-md">${r.vkCode}</div>` : ''}${fullScreenBtn}<p class="text-sm text-gray-700 font-medium leading-snug mt-4">${r.description}</p></div>`;
                 const cacheId = 'route_' + index; sheetCache[cacheId] = html;
-
                 line.bindTooltip(r.title, { sticky: true, className: 'custom-tooltip' });
                 line.on('click', (e) => { map.flyTo(e.latlng, 17); openSheet(html); });
             });
