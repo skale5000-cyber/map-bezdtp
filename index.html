@@ -27,7 +27,7 @@
         .video-container iframe { position: absolute; top: 0; left: 0; width: 100%; height: 100%; border: 0; }
         
         .brand-icon, .instructor-icon, .sign-icon { background: none; border: none; }
-        .leaflet-control-layers { border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.15) !important; border: none !important; margin: 12px !important;}
+        .leaflet-control-layers { border-radius: 12px; box-shadow: 0 4px 10px rgba(0,0,0,0.15) !important; border: none !important; margin: 12px !important; padding: 6px; }
         
         .leaflet-popup { display: none !important; }
 
@@ -40,6 +40,7 @@
 </head>
 <body>
 
+    <!-- Шапка логотип -->
     <div class="absolute top-3 left-3 z-[1000] bg-white/95 backdrop-blur-md rounded-2xl shadow-lg flex items-center border-l-4 border-blue-600 overflow-hidden transition-all duration-300 pointer-events-auto">
         <div class="bg-blue-100 px-3 py-2 text-blue-700 font-black text-xl leading-none italic">76</div>
         <div class="px-4 py-2 hidden sm:flex flex-col">
@@ -48,20 +49,75 @@
         </div>
     </div>
 
-    <!-- Кнопка "Список" -->
-    <div class="absolute top-[80px] left-3 z-[1000] pointer-events-auto">
-        <button onclick="openMenu()" class="bg-white/95 backdrop-blur-md text-gray-800 px-4 py-2 rounded-xl shadow-[0_4px_10px_rgba(0,0,0,0.15)] font-bold text-xs uppercase tracking-wider flex items-center gap-2 border border-gray-100 hover:bg-gray-50 transition">
+    <!-- ПАНЕЛЬ ИНСТРУМЕНТОВ (Кнопки увеличены для удобства на мобильных) -->
+    <div class="absolute top-[80px] left-3 z-[1000] flex flex-col gap-2 pointer-events-none">
+        
+        <button onclick="openMenu()" class="pointer-events-auto bg-white/95 backdrop-blur-md text-gray-800 px-4 py-3 rounded-xl shadow-[0_4px_10px_rgba(0,0,0,0.15)] font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 border border-gray-100 hover:bg-blue-50 hover:text-blue-700 transition w-[130px]">
             📋 Список
         </button>
-    </div>
-
-    <!-- НОВАЯ КНОПКА "РУЛЕТКА" -->
-    <div class="absolute top-[130px] left-3 z-[1000] pointer-events-auto">
-        <button id="measureBtn" onclick="toggleMeasure()" class="bg-white/95 backdrop-blur-md text-gray-800 px-4 py-2 rounded-xl shadow-[0_4px_10px_rgba(0,0,0,0.15)] font-bold text-xs uppercase tracking-wider flex items-center gap-2 border border-gray-100 hover:bg-gray-50 transition w-full justify-center">
+        
+        <button id="measureBtn" onclick="toggleMeasure()" class="pointer-events-auto bg-white/95 backdrop-blur-md text-gray-800 px-4 py-3 rounded-xl shadow-[0_4px_10px_rgba(0,0,0,0.15)] font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 border border-gray-100 hover:bg-blue-50 transition w-[130px]">
             📏 Рулетка
         </button>
+        
+        <a href="exam_guide.html" target="_blank" class="pointer-events-auto bg-white/95 backdrop-blur-md text-blue-700 px-4 py-3 rounded-xl shadow-[0_4px_10px_rgba(0,0,0,0.15)] font-black text-xs uppercase tracking-wider flex items-center justify-center gap-2 border border-blue-100 hover:bg-blue-50 transition w-[130px]" style="text-decoration: none;">
+            📑 Правила
+        </a>
+        
+        <button onclick="openHelp()" class="pointer-events-auto bg-white/95 backdrop-blur-md text-gray-600 px-4 py-3 rounded-xl shadow-[0_4px_10px_rgba(0,0,0,0.15)] font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 border border-gray-100 hover:bg-gray-100 transition w-[130px]">
+            ❓ Помощь
+        </button>
+        
     </div>
 
+    <!-- МОДАЛЬНОЕ ОКНО ПОМОЩИ -->
+    <div id="helpModal" class="fixed inset-0 z-[5000] bg-black/60 backdrop-blur-sm hidden flex-col justify-center items-center p-4 transition-opacity duration-300 opacity-0 pointer-events-none">
+        <div class="bg-white rounded-3xl shadow-2xl max-w-sm w-full overflow-hidden transform transition-transform scale-95 duration-300" id="helpModalContent">
+            <!-- Шапка -->
+            <div class="bg-gradient-to-r from-blue-600 to-blue-500 p-6 text-center relative">
+                <button onclick="closeHelp()" class="absolute top-4 right-4 text-white/80 hover:text-white bg-black/20 hover:bg-black/30 rounded-full w-8 h-8 flex items-center justify-center transition-colors">✕</button>
+                <div class="w-14 h-14 bg-white rounded-full flex items-center justify-center text-2xl mx-auto mb-3 shadow-lg">👋</div>
+                <h2 class="text-2xl font-black text-white leading-tight">Добро пожаловать!</h2>
+                <p class="text-blue-100 text-sm mt-1 font-medium">Инструкция по карте экзаменов</p>
+            </div>
+            
+            <!-- Инструкции -->
+            <div class="p-6 flex flex-col gap-5 max-h-[50vh] overflow-y-auto">
+                <div class="flex items-start gap-4">
+                    <div class="w-10 h-10 bg-emerald-50 text-emerald-600 rounded-xl flex items-center justify-center text-xl shrink-0 shadow-sm">📚</div>
+                    <div>
+                        <h4 class="font-bold text-gray-900 text-sm">Управление слоями (Важно!)</h4>
+                        <p class="text-xs text-gray-600 mt-0.5 leading-relaxed">В правом верхнем углу есть <b>иконка стопки бумаг</b>. Нажми её, чтобы отключить знаки, если они перекрывают карту, или включить спутниковый снимок.</p>
+                    </div>
+                </div>
+
+                <div class="flex items-start gap-4">
+                    <div class="w-10 h-10 bg-pink-50 text-pink-600 rounded-xl flex items-center justify-center text-xl shrink-0 shadow-sm">🎯</div>
+                    <div>
+                        <h4 class="font-bold text-gray-900 text-sm">Секретные точки</h4>
+                        <p class="text-xs text-gray-600 mt-0.5 leading-relaxed">Кликай по меткам на карте. Внутри карточек спрятаны обучающие видео и полезные советы инструктора.</p>
+                    </div>
+                </div>
+                
+                <div class="flex items-start gap-4">
+                    <div class="w-10 h-10 bg-orange-50 text-orange-600 rounded-xl flex items-center justify-center text-xl shrink-0 shadow-sm">📏</div>
+                    <div>
+                        <h4 class="font-bold text-gray-900 text-sm">Измерение дистанции</h4>
+                        <p class="text-xs text-gray-600 mt-0.5 leading-relaxed">В меню слева есть "Рулетка". Включи её и кликай по карте, чтобы измерить расстояние (полезно для парковки от перекрестка).</p>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Кнопка закрытия -->
+            <div class="p-4 bg-gray-50 border-t border-gray-100">
+                <button onclick="closeHelp()" class="w-full bg-blue-600 hover:bg-blue-700 text-white font-black py-3.5 rounded-xl shadow-md hover:shadow-lg transition-all uppercase tracking-widest text-sm">
+                    Понятно, поехали!
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <!-- Боковое меню "Список" -->
     <div id="navMenu" class="fixed inset-y-0 right-0 z-[4000] w-full sm:w-80 bg-white shadow-2xl transform translate-x-full transition-transform duration-300 ease-in-out flex flex-col">
         <div class="bg-blue-600 p-4 flex justify-between items-center shrink-0">
             <h2 class="text-white font-black text-sm uppercase tracking-widest">📍 Доступные разборы</h2>
@@ -72,6 +128,7 @@
         </div>
     </div>
 
+    <!-- Всплывающая нижняя карточка -->
     <div id="bottomSheet" class="fixed inset-x-0 bottom-0 z-[2000] bg-white rounded-t-3xl shadow-[0_-10px_40px_rgba(0,0,0,0.2)] transform translate-y-full transition-transform duration-300 ease-out flex flex-col max-h-[75vh] sm:max-w-md sm:mx-auto sm:mb-4 sm:rounded-3xl sm:inset-x-4">
         <div class="w-full flex justify-center pt-3 pb-2 cursor-pointer shrink-0 relative" onclick="closeSheet()">
             <div class="w-12 h-1.5 bg-gray-300 rounded-full"></div>
@@ -82,6 +139,7 @@
         </div>
     </div>
 
+    <!-- Попап для видео на весь экран -->
     <div id="videoModal" class="fixed inset-0 z-[3000] bg-black hidden flex-col justify-center items-center">
         <button onclick="closeFullscreen()" class="absolute top-6 right-6 text-white text-3xl w-12 h-12 bg-white/20 backdrop-blur-md rounded-full flex justify-center items-center focus:outline-none shadow-lg z-50">&times;</button>
         <div class="w-full max-w-5xl">
@@ -95,27 +153,11 @@
 
     <script>
         // =========================================================================
-        // 🗄️ БАЗА ДАННЫХ (СЮДА МЫ ВСТАВЛЯЕМ ВСЕ ДАННЫЕ ИЗ АДМИНКИ)
+        // 🗄️ БАЗА ДАННЫХ
         // =========================================================================
         
         const videoPointsData = [
-            {
-                lat: 57.5871, lng: 39.8515,
-                title: "Разбор перекрестка у Арены",
-                description: "Посмотри этот короткий видео-разбор, чтобы уверенно проехать перекресток и не завалить экзамен!",
-                telegramLink: "https://t.me/bez_dtp",
-                vkCode: `<iframe src="https://vkvideo.ru/video_ext.php?oid=-236190441&id=456239017&hash=8e2ed08c09146173&hd=3" allow="autoplay; encrypted-media; fullscreen; picture-in-picture;" allowfullscreen></iframe>`
-            },
-            {
-                lat: 57.58718, lng: 39.85072,
-                title: "Разбор от Евгения Чернышева",
-                description: "Внимание на правый ряд! Типичная ловушка для новичков на этом участке.",
-                telegramLink: "https://t.me/evg_chernyshev",
-                authorName: "Евгений Чернышев",
-                authorPhone: "9080367929",
-                authorPrice: "1500 руб / 1.5 часа",
-                vkCode: `<iframe src="https://vkvideo.ru/video_ext.php?oid=-236190441&id=456239017&hash=8e2ed08c09146173&hd=3" allow="autoplay; encrypted-media; fullscreen; picture-in-picture;" allowfullscreen></iframe>`
-            }
+            // 👇 ВСТАВЛЯЙ НОВЫЕ ТОЧКИ С ВИДЕО СЮДА 👇
         ];
 
         const streetPointsData = [
@@ -130,189 +172,109 @@
             { lat: 57.58268, lng: 39.83298, title: "улица Рыкачева", description: "от ул. Титова до  ул. Курчатова", telegramLink: "", authorName: "", authorPhone: "", authorPrice: "0", vkCode: `<iframe src="https://vkvideo.ru/video_ext.php?oid=-236190441&id=456239022&hash=bfcc6e06b9732cc5&hd=3" width="1280" height="720" allow="autoplay; encrypted-media; fullscreen; picture-in-picture; screen-wake-lock;" frameborder="0" allowfullscreen></iframe>` },
             { lat: 57.58263, lng: 39.84903, title: "улица Курчатова", description: "от ул. Павлова до  ул. Рыкачева", telegramLink: "", authorName: "", authorPhone: "", authorPrice: "0", vkCode: `<iframe src="https://vkvideo.ru/video_ext.php?oid=-236190441&id=456239024&hash=1ddb1e564ad42f2d&hd=3" width="1280" height="720" allow="autoplay; encrypted-media; fullscreen; picture-in-picture; screen-wake-lock;" frameborder="0" allowfullscreen></iframe>` },
             { lat: 57.57861, lng: 39.84353, title: "улица Рыкачева, Майорова", description: "от ул. Курчатова до  ул. Менделеева", telegramLink: "", authorName: "", authorPhone: "", authorPrice: "0", vkCode: `<iframe src="https://vkvideo.ru/video_ext.php?oid=-236190441&id=456239023&hash=26ae89e6ca1fdb7f&hd=3" width="1280" height="720" allow="autoplay; encrypted-media; fullscreen; picture-in-picture; screen-wake-lock;" frameborder="0" allowfullscreen></iframe>` },
-            { lat: 57.57862, lng: 39.84344, title: "улица Курчатова", description: "от ул. Рыкачева до  ул. Павлова", telegramLink: "", authorName: "", authorPhone: "", authorPrice: "0", vkCode: `<iframe src="https://vkvideo.ru/video_ext.php?oid=-236190441&id=456239025&hash=a8e5a6380f9b53f1&hd=3" width="1280" height="720" allow="autoplay; encrypted-media; fullscreen; picture-in-picture; screen-wake-lock;" frameborder="0" allowfullscreen></iframe>` }
+            { lat: 57.57862, lng: 39.84344, title: "улица Курчатова", description: "от ул. Рыкачева до  ул. Павлова", telegramLink: "", authorName: "", authorPhone: "", authorPrice: "0", vkCode: `<iframe src="https://vkvideo.ru/video_ext.php?oid=-236190441&id=456239025&hash=a8e5a6380f9b53f1&hd=3" width="1280" height="720" allow="autoplay; encrypted-media; fullscreen; picture-in-picture; screen-wake-lock;" frameborder="0" allowfullscreen></iframe>` },
+            // 👇 ВСТАВЛЯЙ РАЗБОРЫ УЛИЦ СЮДА 👇
         ];
 
         const infoPointsData = [
-            {
-                lat: 57.5880, lng: 39.8520, 
-                title: "Документы для экзамена",
-                description: "Для допуска к экзамену в ГИБДД при себе необходимо иметь паспорт и квитанцию об оплате госпошлины.",
-                imageUrl: "", fileUrl: "", phone: "+7 (4852) 11-22-33" 
-            }
+            // 👇 ВСТАВЛЯЙ ИНФО-ТОЧКИ СЮДА 👇
         ];
 
-        // МАССИВ 1: ТОЛЬКО ЗАДАНИЯ (Маневры)
         const tasksData = [
-            {
-                lat: 57.58876, lng: 39.85076,
-                title: "Разворот в ограниченном пространстве",
-                description: "Улица на которой могут давать задание «разворот в ограниченном пространстве с применением заднего хода». Помните, что разворот запрещен в местах с видимостью дороги хотя б в одном направлении менее 100 метров. Исключение, если инспектор сам, из-за дорожной обстановки или по другим причинам указывает место для выполнения задания."
-            },{
-    lat: 57.58958, lng: 39.84385,
-    title: "Разворот в ограниченном пространстве",
-    description: "Улица на которой могут давать задание «разворот в ограниченном пространстве с применением заднего хода». Помните, что разворот запрещен в местах с видимостью дороги хотя б в одном направлении менее 100 метров. Исключение, если инспектор сам, из-за дорожной обстановки или по другим причинам указывает место для выполнения задания."
-},{
-    lat: 57.58867, lng: 39.83807,
-    title: "Разворот в ограниченном пространстве",
-    description: "Улица на которой могут давать задание «разворот в ограниченном пространстве с применением заднего хода». Помните, что разворот запрещен в местах с видимостью дороги хотя б в одном направлении менее 100 метров. Исключение, если инспектор сам, из-за дорожной обстановки или по другим причинам указывает место для выполнения задания."
-},{
-    lat: 57.58790, lng: 39.83556,
-    title: "Разворот в ограниченном пространстве",
-    description: "Улица на которой могут давать задание «разворот в ограниченном пространстве с применением заднего хода». Помните, что разворот запрещен в местах с видимостью дороги хотя б в одном направлении менее 100 метров. Исключение, если инспектор сам, из-за дорожной обстановки или по другим причинам указывает место для выполнения задания."
-},{
-    lat: 57.58216, lng: 39.84223,
-    title: "Разворот в ограниченном пространстве",
-    description: "Улица на которой могут давать задание «разворот в ограниченном пространстве с применением заднего хода». Помните, что разворот запрещен в местах с видимостью дороги хотя б в одном направлении менее 100 метров. Исключение, если инспектор сам, из-за дорожной обстановки или по другим причинам указывает место для выполнения задания."
-},{
-    lat: 57.58017, lng: 39.84722,
-    title: "Разворот в ограниченном пространстве",
-    description: "Улица на которой могут давать задание «разворот в ограниченном пространстве с применением заднего хода». Помните, что разворот запрещен в местах с видимостью дороги хотя б в одном направлении менее 100 метров. Исключение, если инспектор сам, из-за дорожной обстановки или по другим причинам указывает место для выполнения задания."
-},{
-    lat: 57.58038, lng: 39.84674,
-    title: "Остановка и начало движения на подъеме",
-    description: "Улица на которой могут давать задание «Остановка и начало движения на подъеме». "
-},{
-    lat: 57.58221, lng: 39.84999,
-    title: "Остановка и начало движения на подъеме",
-    description: "Улица на которой могут давать задание «Остановка и начало движения на подъеме». "
-},{
-    lat: 57.58700, lng: 39.83807,
-    title: "Остановка и начало движения на подъеме",
-    description: "Улица на которой могут давать задание «Остановка и начало движения на подъеме». "
-},{
-    lat: 57.58981, lng: 39.84062,
-    title: "Остановка и начало движения на подъеме",
-    description: "Улица на которой могут давать задание «Остановка и начало движения на подъеме». "
-},{
-    lat: 57.58376, lng: 39.86147,
-    title: "Остановка и начало движения на подъеме",
-    description: "Улица на которой могут давать задание «Остановка и начало движения на подъеме». "
-},{
-    lat: 57.58224, lng: 39.84202,
-    title: "Остановка и начало движения на подъеме",
-    description: "Улица на которой могут давать задание «Остановка и начало движения на подъеме». "
-},{
-    lat: 57.59533, lng: 39.85826,
-    title: "Остановка и начало движения на подъеме",
-    description: "Улица на которой могут давать задание «Остановка и начало движения на подъеме». "
-},{
-    lat: 57.59627, lng: 39.85903,
-    title: "Разворот в ограниченном пространстве",
-    description: "Улица на которой могут давать задание «разворот в ограниченном пространстве с применением заднего хода». Помните, что разворот запрещен в местах с видимостью дороги хотя б в одном направлении менее 100 метров. Исключение, если инспектор сам, из-за дорожной обстановки или по другим причинам указывает место для выполнения задания."
-},
+            { lat: 57.58876, lng: 39.85076, title: "1.3. Разворот ТС в ограниченном пространстве (при ограниченной ширине проезжей части) с использованием движения задним ходом", description: "Улица на которой могут давать задание. Помните, что разворот запрещен в местах с видимостью дороги хотя б в одном направлении менее 100 метров. Исключение, если инспектор сам, из-за дорожной обстановки или по другим причинам указывает место для выполнения задания." },
+            { lat: 57.58958, lng: 39.84385, title: "1.3. Разворот ТС в ограниченном пространстве (при ограниченной ширине проезжей части) с использованием движения задним ходом", description: "Улица на которой могут давать задание «разворот в ограниченном пространстве с применением заднего хода». Помните, что разворот запрещен в местах с видимостью дороги хотя б в одном направлении менее 100 метров." },
+            { lat: 57.58867, lng: 39.83807, title: "1.3. Разворот ТС в ограниченном пространстве (при ограниченной ширине проезжей части) с использованием движения задним ходом", description: "Улица на которой могут давать задание «разворот в ограниченном пространстве с применением заднего хода». Помните, что разворот запрещен в местах с видимостью дороги хотя б в одном направлении менее 100 метров." },
+            { lat: 57.58790, lng: 39.83556, title: "1.3. Разворот ТС в ограниченном пространстве (при ограниченной ширине проезжей части) с использованием движения задним ходом", description: "Улица на которой могут давать задание «разворот в ограниченном пространстве с применением заднего хода». Помните, что разворот запрещен в местах с видимостью дороги хотя б в одном направлении менее 100 метров." },
+            { lat: 57.58216, lng: 39.84223, title: "1.3. Разворот ТС в ограниченном пространстве (при ограниченной ширине проезжей части) с использованием движения задним ходом", description: "Улица на которой могут давать задание «разворот в ограниченном пространстве с применением заднего хода». Помните, что разворот запрещен в местах с видимостью дороги хотя б в одном направлении менее 100 метров." },
+            { lat: 57.58017, lng: 39.84722, title: "1.3. Разворот ТС в ограниченном пространстве (при ограниченной ширине проезжей части) с использованием движения задним ходом", description: "Улица на которой могут давать задание «разворот в ограниченном пространстве с применением заднего хода». Помните, что разворот запрещен в местах с видимостью дороги хотя б в одном направлении менее 100 метров." },
+            { lat: 57.58038, lng: 39.84674, title: "1.4. Остановка и начало движения на подъеме", description: "Улица на которой могут давать задание «Остановка и начало движения на подъеме». " },
+            { lat: 57.58221, lng: 39.84999, title: "1.4. Остановка и начало движения на подъеме", description: "Улица на которой могут давать задание «Остановка и начало движения на подъеме». " },
+            { lat: 57.58700, lng: 39.83807, title: "1.4. Остановка и начало движения на подъеме", description: "Улица на которой могут давать задание «Остановка и начало движения на подъеме». " },
+            { lat: 57.58981, lng: 39.84062, title: "1.4. Остановка и начало движения на подъеме", description: "Улица на которой могут давать задание «Остановка и начало движения на подъеме». " },
+            { lat: 57.58376, lng: 39.86147, title: "1.4. Остановка и начало движения на подъеме", description: "Улица на которой могут давать задание «Остановка и начало движения на подъеме». " },
+            { lat: 57.58224, lng: 39.84202, title: "1.4. Остановка и начало движения на подъеме", description: "Улица на которой могут давать задание «Остановка и начало движения на подъеме». " },
+            { lat: 57.59533, lng: 39.85826, title: "1.4. Остановка и начало движения на подъеме", description: "Улица на которой могут давать задание «Остановка и начало движения на подъеме». " },
+            { lat: 57.59627, lng: 39.85903, title: "1.3. Разворот ТС в ограниченном пространстве (при ограниченной ширине проезжей части) с использованием движения задним ходом", description: "Улица на которой могут давать задание «разворот в ограниченном пространстве с применением заднего хода». Помните, что разворот запрещен в местах с видимостью дороги хотя б в одном направлении менее 100 метров." },
+            // 👇 ВСТАВЛЯЙ НОВЫЕ ЗАДАНИЯ СЮДА 👇
         ];
 
-        // МАССИВ 2: НОВЫЙ! ТОЛЬКО ОПРОСЫ
         const pollsData = [
-            {
-                lat: 57.58650, lng: 39.85300,
-                title: "Ситуация: Как вы здесь поворачиваете?",
-                description: "Опрос для учеников: как вы ведете себя на этом участке? Какую полосу занимаете и какой поворотник включаете? Переходи в Telegram и голосуй!",
-                telegramLink: "https://t.me/bez_dtp"
-            }
+            // 👇 ВСТАВЛЯЙ НОВЫЕ ОПРОСЫ СЮДА 👇
         ];
 
         const signsData = [
-            { lat: 57.5891, lng: 39.8485, type: 'no_stop', title: "Остановка запрещена", description: "На этом участке парковаться нельзя, сразу несдача!" },
-            { lat: 57.5880, lng: 39.8500, type: 'speed40', title: "Ограничение 40 км/ч", description: "Зона действия знака до следующего перекрестка." },
-            { lat: 57.5875, lng: 39.8517, type: 'speed20', title: "Ограничение 20 км/ч", description: "Внимание, пешеходный переход рядом." },
-            { lat: 57.5861, lng: 39.8545, type: 'main_road', title: "Главная дорога", description: "У нас приоритет на этом перекрестке." },
-            { lat: 57.5885, lng: 39.8495, type: 'stop', title: "Движение без остановки запрещено", description: "Обязательная фиксация автомобиля! Останавливаемся у стоп-линии или края пересекаемой проезжей части." },
-            { lat: 57.5878, lng: 39.8490, type: 'yield', title: "Уступи дорогу", description: "Внимательно смотрим по сторонам и уступаем всем, кто движется по главной!" },
-            {
-    lat: 57.59228, lng: 39.86581,
-    type: 'speed20',
-    title: "",
-    description: ""
-},{
-    lat: 57.59225, lng: 39.86874,
-    type: 'speed20',
-    title: "",
-    description: ""
-},{
-    lat: 57.59008, lng: 39.84763,
-    type: 'no_stop',
-    title: "",
-    description: ""
-},{
-    lat: 57.59049, lng: 39.85019,
-    type: 'no_stop',
-    title: "",
-    description: ""
-},{
-    lat: 57.59007, lng: 39.84764,
-    type: 'no_stop',
-    title: "",
-    description: ""
-},{
-    lat: 57.58813, lng: 39.84490,
-    type: 'no_stop',
-    title: "",
-    description: ""
-},{
-    lat: 57.58849, lng: 39.84638,
-    type: 'no_stop',
-    title: "",
-    description: ""
-},{
-    lat: 57.58752, lng: 39.84912,
-    type: 'no_stop',
-    title: "",
-    description: ""
-},{
-    lat: 57.58572, lng: 39.85470,
-    type: 'no_stop',
-    title: "",
-    description: ""
-},{
-    lat: 57.58644, lng: 39.85264,
-    type: 'no_stop',
-    title: "",
-    description: ""
-},{
-    lat: 57.58157, lng: 39.84385,
-    type: 'stop',
-    title: "",
-    description: ""
-},{
-    lat: 57.58881, lng: 39.83334,
-    type: 'speed20',
-    title: "",
-    description: ""
-},{
-    lat: 57.58826, lng: 39.83509,
-    type: 'speed20',
-    title: "",
-    description: ""
-},
+            { lat: 57.59228, lng: 39.86581, type: 'speed20', title: "", description: "" },
+            { lat: 57.59225, lng: 39.86874, type: 'speed20', title: "", description: "" },
+            { lat: 57.59008, lng: 39.84763, type: 'no_stop', title: "", description: "" },
+            { lat: 57.59049, lng: 39.85019, type: 'no_stop', title: "", description: "" },
+            { lat: 57.59007, lng: 39.84764, type: 'no_stop', title: "", description: "" },
+            { lat: 57.59004, lng: 39.84759, type: 'no_stop', title: "", description: "" }, 
+            { lat: 57.58849, lng: 39.84638, type: 'no_stop', title: "", description: "" },
+            { lat: 57.58752, lng: 39.84912, type: 'no_stop', title: "", description: "" },
+            { lat: 57.58572, lng: 39.85470, type: 'no_stop', title: "", description: "" },
+            { lat: 57.58644, lng: 39.85264, type: 'no_stop', title: "", description: "" },
+            { lat: 57.58157, lng: 39.84385, type: 'stop', title: "", description: "" },
+            { lat: 57.58881, lng: 39.83334, type: 'speed20', title: "", description: "" },
+            { lat: 57.58826, lng: 39.83509, type: 'speed20', title: "", description: "" },
+            { lat: 57.58143, lng: 39.84386, type: 'main_road', title: "", description: "" },
+            { lat: 57.58155, lng: 39.84404, type: 'yield', title: "", description: "" },
+            { lat: 57.58152, lng: 39.83614, type: 'one_way', title: "", description: "" },
+            { lat: 57.58048, lng: 39.83880, type: 'one_way', title: "", description: "" },
+            { lat: 57.57960, lng: 39.84113, type: 'one_way', title: "", description: "" },
+            { lat: 57.58084, lng: 39.84295, type: 'one_way', title: "", description: "" },
+            { lat: 57.58152, lng: 39.84376, type: 'end_one_way', title: "", description: "" },
+            { lat: 57.57949, lng: 39.84122, type: 'end_one_way', title: "", description: "" },
+            { lat: 57.59048, lng: 39.85072, type: 'end_no_stop', title: "Конец знака 'Остановка запрещена'", description: "" },
+            { lat: 57.58700, lng: 39.85017, type: 'end_no_stop', title: "Конец знака 'Остановка запрещена'", description: "" },
+            { lat: 57.59039, lng: 39.85202, type: 'main_road', title: "", description: "" },
+            { lat: 57.59036, lng: 39.85237, type: 'yield', title: "", description: "" },
+            // 👇 ВСТАВЛЯЙ НОВЫЕ ЗНАКИ СЮДА 👇
         ];
 
         const routeLinesData = [
-            {
-                title: "Улица Гагарина",
-                description: "Проезд всей улицы от светофора до кольца. Обрати внимание на знаки остановки!",
-                vkCode: `<iframe src="https://vkvideo.ru/video_ext.php?oid=-236190441&id=456239017&hash=8e2ed08c09146173&hd=3" allow="autoplay; encrypted-media; fullscreen; picture-in-picture;" allowfullscreen></iframe>`,
-                coordinates: [[57.58910, 39.84850], [57.58860, 39.84960], [57.58810, 39.85050], [57.58750, 39.85170], [57.58680, 39.85300], [57.58610, 39.85450]]
-            },
+            // 👇 ВСТАВЛЯЙ НОВЫЕ МАРШРУТЫ СЮДА 👇
         ];
 
         const instructorsData = [
-            {
-                lat: 57.5855, lng: 39.8500,
-                name: "Иван Петров",
-                car: "Hyundai Solaris (МКПП)",
-                phone: "+7 (999) 123-45-67",
-                description: "Научу водить без стресса и паники! Разбираем сложные маршруты Ярославля.",
-                photoUrl: "https://images.unsplash.com/photo-1560250097-0b93528c311a?q=80&w=100&auto=format&fit=crop",
-                rating: "5.0", reviewsCount: 12,
-                reviewsLink: "https://t.me/bez_dtp", telegramLink: "https://t.me/bez_dtp"
-            }
+            // 👇 ВСТАВЛЯЙ НОВЫХ ИНСТРУКТОРОВ СЮДА 👇
         ];
 
         const sheetCache = {};
 
-        // --- ЛОГИКА ИНТЕРФЕЙСА ---
+        // --- ЛОГИКА ОНБОРДИНГА И ОКОН ---
+        
+        const helpModal = document.getElementById('helpModal');
+        const helpModalContent = document.getElementById('helpModalContent');
+
+        function openHelp() {
+            helpModal.classList.remove('hidden');
+            // Маленькая задержка для запуска CSS анимации
+            setTimeout(() => {
+                helpModal.classList.remove('opacity-0', 'pointer-events-none');
+                helpModalContent.classList.remove('scale-95');
+            }, 10);
+        }
+
+        function closeHelp() {
+            helpModal.classList.add('opacity-0', 'pointer-events-none');
+            helpModalContent.classList.add('scale-95');
+            setTimeout(() => {
+                helpModal.classList.add('hidden');
+            }, 300); // Ждем конца анимации
+            // Записываем, что пользователь посмотрел
+            localStorage.setItem('hasSeenTour', 'true');
+        }
+
+        // Запуск при старте
+        window.addEventListener('DOMContentLoaded', () => {
+            if (!localStorage.getItem('hasSeenTour')) {
+                // Если первый раз - показываем через секунду
+                setTimeout(openHelp, 1000);
+            }
+        });
+
+
+        // --- ЛОГИКА ИНТЕРФЕЙСА КАРТЫ ---
         function openSheet(htmlContent) {
             if (isMeasuring) return; 
             document.getElementById('sheetContent').innerHTML = htmlContent;
@@ -374,7 +336,7 @@
         const infoPointsGroup = L.layerGroup().addTo(map);
         const signsGroup = L.layerGroup().addTo(map); 
         const tasksGroup = L.layerGroup().addTo(map);
-        const pollsGroup = L.layerGroup().addTo(map); // НОВЫЙ СЛОЙ ОПРОСОВ
+        const pollsGroup = L.layerGroup().addTo(map);
         const routeLinesGroup = L.layerGroup().addTo(map);
         const instructorsGroup = L.layerGroup().addTo(map);
 
@@ -443,29 +405,31 @@
         });
 
         // =========================================================
-        // ИКОНКИ
+        // ИКОНКИ И СТИЛИЗАЦИЯ
         // =========================================================
 
         const videoIcon = L.divIcon({ className: 'brand-icon', html: `<div class="w-7 h-7 bg-blue-600 rounded-lg border-2 border-white shadow-md flex items-center justify-center text-white text-xs">▶️</div>`, iconSize: [28, 28], iconAnchor: [14, 14] });
         const streetIcon = L.divIcon({ className: 'brand-icon', html: `<div class="w-6 h-6 bg-emerald-500 rounded-full border-[1.5px] border-white shadow-sm flex items-center justify-center text-white text-[10px]">📍</div>`, iconSize: [24, 24], iconAnchor: [12, 12] });
         const instructorIcon = L.divIcon({ className: 'instructor-icon', html: `<div class="w-8 h-8 bg-orange-500 rounded-full border-2 border-white shadow-md flex items-center justify-center text-sm">👨‍🏫</div>`, iconSize: [32, 32], iconAnchor: [16, 16] });
         const infoIcon = L.divIcon({ className: 'brand-icon', html: `<div class="w-8 h-8 bg-purple-600 rounded-full border-2 border-white shadow-md flex items-center justify-center text-white font-bold text-sm">!</div>`, iconSize: [32, 32], iconAnchor: [16, 16] });
-        
-        // Иконка Задания (Розовая)
         const taskIcon = L.divIcon({ className: 'brand-icon', html: `<div class="w-8 h-8 bg-pink-600 rounded-full border-2 border-white shadow-md flex items-center justify-center text-white text-sm">🎯</div>`, iconSize: [32, 32], iconAnchor: [16, 16] });
-        
-        // НОВАЯ Иконка Опроса (Бирюзовая)
         const pollIcon = L.divIcon({ className: 'brand-icon', html: `<div class="w-8 h-8 bg-cyan-500 rounded-full border-2 border-white shadow-md flex items-center justify-center text-white text-[10px] font-black">❓</div>`, iconSize: [32, 32], iconAnchor: [16, 16] });
 
         function getSignIcon(type) {
             let htmlContent = ''; let iSize = [28, 28]; let iAnchor = [14, 14];
             const noStopHtml = `<div class="w-7 h-7 bg-blue-700 rounded-full border-[3px] border-red-600 shadow-md relative flex items-center justify-center overflow-hidden z-10"><div class="absolute w-8 h-[3px] bg-red-600 rotate-45"></div><div class="absolute w-8 h-[3px] bg-red-600 -rotate-45"></div></div>`;
+            
             if (type === 'speed40') { htmlContent = `<div class="w-7 h-7 bg-white rounded-full border-[3px] border-red-600 shadow-md flex items-center justify-center font-black text-black text-[11px] leading-none tracking-tighter">40</div>`; }
             else if (type === 'speed20') { htmlContent = `<div class="w-7 h-7 bg-white rounded-full border-[3px] border-red-600 shadow-md flex items-center justify-center font-black text-black text-[11px] leading-none tracking-tighter">20</div>`; }
             else if (type === 'main_road') { htmlContent = `<div class="w-7 h-7 flex items-center justify-center drop-shadow-md"><div class="w-4 h-4 bg-yellow-400 border-[2px] border-white ring-1 ring-gray-400 transform rotate-45"></div></div>`; }
             else if (type === 'no_stop') { htmlContent = noStopHtml; }
             else if (type === 'stop') { htmlContent = `<div class="flex items-center justify-center w-7 h-7 drop-shadow-md"><svg viewBox="0 0 100 100" class="w-full h-full"><polygon points="30,5 70,5 95,30 95,70 70,95 30,95 5,70 5,30" fill="#dc2626" stroke="white" stroke-width="4"/><text x="50" y="54" font-family="sans-serif" font-weight="900" font-size="28" fill="white" text-anchor="middle" dominant-baseline="middle" letter-spacing="-1">STOP</text></svg></div>`; }
             else if (type === 'yield') { htmlContent = `<div class="flex items-center justify-center w-7 h-7 drop-shadow-md"><svg viewBox="0 0 100 100" class="w-full h-full"><polygon points="5,10 95,10 50,90" fill="white" stroke="#dc2626" stroke-width="14" stroke-linejoin="round"/></svg></div>`; }
+            else if (type === 'one_way') { htmlContent = `<div class="w-7 h-7 bg-blue-600 rounded-md border-[1.5px] border-white shadow-md flex items-center justify-center drop-shadow-md"><svg viewBox="0 0 24 24" class="w-4 h-5" fill="white"><path d="M12 2L4 10h4v12h8V10h4L12 2z"/></svg></div>`; }
+            else if (type === 'end_no_stop') { htmlContent = `<div class="w-7 h-7 bg-white rounded-md border-[1.5px] border-gray-400 shadow-md flex items-center justify-center relative overflow-hidden"><div class="w-5 h-5 rounded-full border-[2px] border-gray-400 relative flex items-center justify-center"><div class="absolute w-6 h-[2px] bg-gray-400 rotate-45"></div><div class="absolute w-6 h-[2px] bg-gray-400 -rotate-45"></div></div><div class="absolute w-[140%] h-[1px] bg-gray-700 -rotate-45 mt-[-6px] z-10"></div><div class="absolute w-[140%] h-[1px] bg-gray-700 -rotate-45 mt-[-2px] z-10"></div><div class="absolute w-[140%] h-[1px] bg-gray-700 -rotate-45 mt-[2px] z-10"></div><div class="absolute w-[140%] h-[1px] bg-gray-700 -rotate-45 mt-[6px] z-10"></div></div>`; }
+            else if (type === 'end_one_way') { htmlContent = `<div class="w-7 h-7 bg-blue-600 rounded-sm border-[1.5px] border-white shadow-md flex items-center justify-center relative drop-shadow-md overflow-hidden"><svg viewBox="0 0 24 24" class="w-4 h-5" fill="white"><path d="M12 2L4 10h4v12h8V10h4L12 2z"/></svg><div class="absolute w-[140%] h-[2.5px] bg-red-600 -rotate-45 shadow-sm"></div></div>`; }
+            else if (type === 'end_speed20') { htmlContent = `<div class="w-7 h-7 bg-white rounded-full border-[3px] border-gray-400 shadow-md flex items-center justify-center relative overflow-hidden"><span class="font-black text-gray-400 text-[11px] leading-none tracking-tighter z-0">20</span><div class="absolute w-[120%] h-[1px] bg-gray-700 -rotate-45 mt-[-6px] z-10"></div><div class="absolute w-[120%] h-[1px] bg-gray-700 -rotate-45 mt-[-2px] z-10"></div><div class="absolute w-[120%] h-[1px] bg-gray-700 -rotate-45 mt-[2px] z-10"></div><div class="absolute w-[120%] h-[1px] bg-gray-700 -rotate-45 mt-[6px] z-10"></div></div>`; }
+            
             return L.divIcon({ className: 'sign-icon', html: htmlContent, iconSize: iSize, iconAnchor: iAnchor });
         }
 
@@ -497,19 +461,55 @@
             menuHTML += `</div>`;
         }
 
-        // ЗАДАНИЯ (Теперь без кнопок Telegram)
+        // ЗАДАНИЯ - С УМНЫМ ПАРСЕРОМ ПОДСКАЗОК
         if (tasksData && tasksData.length > 0) {
             menuHTML += `<h3 class="font-bold text-gray-400 text-[10px] uppercase tracking-widest mb-2 mt-2">🎯 Практические задания</h3><div class="flex flex-col gap-2 mb-4">`;
             tasksData.forEach((p, index) => {
-                const html = `<div class="flex flex-col"><span class="text-pink-600 text-[10px] font-black uppercase tracking-widest mb-1">Экзаменационное задание</span><h3 class="font-black text-gray-900 text-xl leading-tight mb-3">${p.title}</h3><p class="text-sm text-gray-700 font-medium leading-snug mt-2">${p.description}</p></div>`;
+                
+                // ПАРСЕР: Делаем короткое имя для всплывающей подсказки на карте
+                let shortName = "Задание ГИБДД";
+                if (p.title.includes("1.1.")) shortName = "1.1 Парковка 90°";
+                else if (p.title.includes("1.2.")) shortName = "1.2 Параллельная парковка";
+                else if (p.title.includes("1.3.")) shortName = "1.3 Разворот";
+                else if (p.title.includes("1.4.")) shortName = "1.4 Остановка/старт на подъеме";
+                else if (p.title.includes("1.5.")) shortName = "1.5 Парковка передом";
+                else if (p.title.includes("1.6.")) shortName = "1.6 Регулируемый перекресток";
+                else if (p.title.includes("1.7.")) shortName = "1.7 Равнозначный перекресток";
+                else if (p.title.includes("1.8.")) shortName = "1.8 Неравнозначный перекресток";
+                else if (p.title.includes("1.9.")) shortName = "1.9 Повороты";
+                else if (p.title.includes("1.10.")) shortName = "1.10 Ж/Д переезд";
+                else if (p.title.includes("1.11.")) shortName = "1.11 Перестроение";
+                else if (p.title.includes("1.12.")) shortName = "1.12 Обгон / Опережение";
+                else if (p.title.includes("1.13.")) shortName = "1.13 Максимальная скорость";
+                else if (p.title.includes("1.14.")) shortName = "1.14 Пешеходный переход";
+                else if (p.title.includes("1.15.")) shortName = "1.15 Торможение и остановка";
+                else if (p.title.includes("1.18.")) shortName = "1.18 Разворот на перекрестке";
+
+                const html = `
+                    <div class="flex flex-col">
+                        <span class="text-pink-600 text-[10px] font-black uppercase tracking-widest mb-1">Экзаменационный лист ГИБДД</span>
+                        <div class="bg-white border-2 border-gray-800 rounded-md p-3 mb-3 mt-2 flex items-start gap-3 shadow-sm relative">
+                            <div class="absolute -top-3 -right-2 text-2xl transform rotate-12">📝</div>
+                            <div class="w-5 h-5 border-2 border-gray-800 rounded-sm flex items-center justify-center shrink-0 mt-0.5 text-gray-800 font-bold text-sm">✓</div>
+                            <div>
+                                <p class="font-bold text-gray-900 text-[13px] leading-snug">${p.title}</p>
+                            </div>
+                        </div>
+                        <div class="bg-pink-50 p-3 rounded-lg border border-pink-100">
+                            <span class="font-bold text-pink-700 text-[10px] uppercase tracking-wider block mb-1">Совет инструктора:</span>
+                            <p class="text-sm text-gray-700 font-medium leading-snug">${p.description}</p>
+                        </div>
+                    </div>`;
                 const cacheId = 'task_' + index; sheetCache[cacheId] = html;
-                L.marker([p.lat, p.lng], {icon: taskIcon}).addTo(tasksGroup).bindTooltip(p.title, { direction: 'top', offset: [0, -10], className: 'custom-tooltip' }).on('click', () => { map.flyTo([p.lat, p.lng], 17); openSheet(html); });
-                menuHTML += `<button onclick="flyToPoint(${p.lat}, ${p.lng}, '${cacheId}')" class="w-full text-left bg-white p-3 rounded-xl border border-gray-100 shadow-sm hover:border-pink-300 hover:shadow-md transition group"><div class="font-bold text-gray-800 text-sm group-hover:text-pink-600">${p.title}</div><div class="text-[10px] text-gray-400 mt-1 truncate">${p.description}</div></button>`;
+                
+                // ВАЖНО: Используем короткое имя для подсказки
+                L.marker([p.lat, p.lng], {icon: taskIcon}).addTo(tasksGroup).bindTooltip(shortName, { direction: 'top', offset: [0, -10], className: 'custom-tooltip' }).on('click', () => { map.flyTo([p.lat, p.lng], 17); openSheet(html); });
+                
+                menuHTML += `<button onclick="flyToPoint(${p.lat}, ${p.lng}, '${cacheId}')" class="w-full text-left bg-white p-3 rounded-xl border border-gray-100 shadow-sm hover:border-pink-300 hover:shadow-md transition group"><div class="font-bold text-gray-800 text-xs leading-tight group-hover:text-pink-600">${shortName}</div></button>`;
             });
             menuHTML += `</div>`;
         }
 
-        // ОПРОСЫ (Новый крутой слой)
         if (pollsData && pollsData.length > 0) {
             menuHTML += `<h3 class="font-bold text-gray-400 text-[10px] uppercase tracking-widest mb-2 mt-2">❓ Интерактивные опросы</h3><div class="flex flex-col gap-2 mb-4">`;
             pollsData.forEach((p, index) => {
@@ -525,10 +525,31 @@
         if (signsData.length > 0) {
             menuHTML += `<h3 class="font-bold text-gray-400 text-[10px] uppercase tracking-widest mb-2 mt-2">🚦 Дорожные знаки</h3><div class="flex flex-col gap-2 mb-4">`;
             signsData.forEach((p, index) => {
-                const html = `<div class="flex flex-col"><span class="text-red-600 text-[10px] font-black uppercase tracking-widest mb-1">Внимание на знак</span><h3 class="font-black text-gray-900 text-xl leading-tight mb-2">${p.title}</h3><p class="text-sm text-gray-700 font-medium leading-snug mt-2">${p.description}</p></div>`;
+                
+                // ЗАЩИТНОЕ ПРОГРАММИРОВАНИЕ: если название пустое, даем стандартное имя по типу знака
+                let displayTitle = p.title;
+                if (!displayTitle) {
+                    if (p.type === 'no_stop') displayTitle = 'Остановка запрещена';
+                    else if (p.type === 'speed40') displayTitle = 'Ограничение 40 км/ч';
+                    else if (p.type === 'speed20') displayTitle = 'Ограничение 20 км/ч';
+                    else if (p.type === 'main_road') displayTitle = 'Главная дорога';
+                    else if (p.type === 'stop') displayTitle = 'Знак STOP';
+                    else if (p.type === 'yield') displayTitle = 'Уступи дорогу';
+                    else if (p.type === 'one_way') displayTitle = 'Одностороннее движение';
+                    else if (p.type === 'end_no_stop') displayTitle = 'Конец: Остановка запрещена';
+                    else if (p.type === 'end_one_way') displayTitle = 'Конец: Одностороннее движение';
+                    else if (p.type === 'end_speed20') displayTitle = 'Конец: 20 км/ч';
+                    else displayTitle = 'Дорожный знак';
+                }
+
+                const html = `<div class="flex flex-col"><span class="text-red-600 text-[10px] font-black uppercase tracking-widest mb-1">Внимание на знак</span><h3 class="font-black text-gray-900 text-xl leading-tight mb-2">${displayTitle}</h3><p class="text-sm text-gray-700 font-medium leading-snug mt-2">${p.description}</p></div>`;
                 const cacheId = 'sign_' + index; sheetCache[cacheId] = html;
-                L.marker([p.lat, p.lng], {icon: getSignIcon(p.type)}).addTo(signsGroup).bindTooltip(p.title, { direction: 'top', offset: [0, -10], className: 'custom-tooltip' }).on('click', () => { map.flyTo([p.lat, p.lng], 17); openSheet(html); });
-                menuHTML += `<button onclick="flyToPoint(${p.lat}, ${p.lng}, '${cacheId}')" class="w-full text-left bg-white p-3 rounded-xl border border-gray-100 shadow-sm hover:border-red-300 hover:shadow-md transition group"><div class="font-bold text-gray-800 text-sm group-hover:text-red-600">${p.title}</div><div class="text-[10px] text-gray-400 mt-1 truncate">${p.description}</div></button>`;
+                
+                // Передаем displayTitle во всплывающую подсказку на самой карте
+                L.marker([p.lat, p.lng], {icon: getSignIcon(p.type)}).addTo(signsGroup).bindTooltip(displayTitle, { direction: 'top', offset: [0, -10], className: 'custom-tooltip' }).on('click', () => { map.flyTo([p.lat, p.lng], 17); openSheet(html); });
+                
+                // Передаем displayTitle в боковое меню
+                menuHTML += `<button onclick="flyToPoint(${p.lat}, ${p.lng}, '${cacheId}')" class="w-full text-left bg-white p-3 rounded-xl border border-gray-100 shadow-sm hover:border-red-300 hover:shadow-md transition group"><div class="font-bold text-gray-800 text-sm group-hover:text-red-600">${displayTitle}</div><div class="text-[10px] text-gray-400 mt-1 truncate">${p.description}</div></button>`;
             });
             menuHTML += `</div>`;
         }
